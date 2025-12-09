@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -7,6 +8,7 @@ import { WishlistProvider } from './context/WishlistContext';
 import { ReviewProvider } from './context/ReviewContext';
 import { OrderProvider } from './context/OrderContext';
 import { AuthProvider } from './context/AuthContext';
+import { ProductProvider } from './context/ProductContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -18,15 +20,17 @@ root.render(
   <React.StrictMode>
     <HashRouter>
       <AuthProvider>
-        <WishlistProvider>
-          <ReviewProvider>
-            <OrderProvider>
-              <CartProvider>
-                <App />
-              </CartProvider>
-            </OrderProvider>
-          </ReviewProvider>
-        </WishlistProvider>
+        <ProductProvider>
+          <WishlistProvider>
+            <ReviewProvider>
+              <OrderProvider>
+                <CartProvider>
+                  <App />
+                </CartProvider>
+              </OrderProvider>
+            </ReviewProvider>
+          </WishlistProvider>
+        </ProductProvider>
       </AuthProvider>
     </HashRouter>
   </React.StrictMode>

@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from './Icon';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
-import { PRODUCTS, CATEGORIES } from '../types';
+import { useProducts } from '../context/ProductContext';
+import { CATEGORIES } from '../types';
 import type { Product, Category } from '../constants';
 
 const HighlightedText: React.FC<{ text: string; highlight: string }> = ({ text, highlight }) => {
@@ -46,6 +48,7 @@ const Header: React.FC = () => {
   const { getCartItemCount } = useCart();
   const { getWishlistItemCount } = useWishlist();
   const { isAuthenticated, user } = useAuth();
+  const { products } = useProducts();
   const cartItemCount = getCartItemCount();
   const wishlistItemCount = getWishlistItemCount();
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,7 +70,7 @@ const Header: React.FC = () => {
 
     const lowerCaseQuery = searchQuery.toLowerCase();
 
-    const filteredProducts = PRODUCTS.filter(product =>
+    const filteredProducts = products.filter(product =>
       product.name.toLowerCase().includes(lowerCaseQuery)
     ).slice(0, 5);
 
@@ -82,7 +85,7 @@ const Header: React.FC = () => {
 
     setSuggestions(newSuggestions);
     setShowSuggestions(newSuggestions.length > 0);
-  }, [searchQuery]);
+  }, [searchQuery, products]);
 
   const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     // If the focus is moving to an element outside the search container, hide suggestions.

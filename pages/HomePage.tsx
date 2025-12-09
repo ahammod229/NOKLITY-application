@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-// FIX: Imported PRODUCTS constant from `types.ts` where it is defined.
-import { PRODUCTS } from '../types';
+import { useProducts } from '../context/ProductContext';
 import ProductCard from '../components/ProductCard';
 import { Icon } from '../components/Icon';
 import QuickViewModal from '../components/QuickViewModal';
 import type { Product } from '../constants';
 
 const HomePage: React.FC = () => {
-  const flashSaleProducts = PRODUCTS.filter(p => p.originalPrice);
-  const regularProducts = PRODUCTS.filter(p => !p.originalPrice);
+  const { products } = useProducts();
+  const flashSaleProducts = products.filter(p => p.originalPrice);
+  const regularProducts = products.filter(p => !p.originalPrice);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   const handleQuickView = (product: Product) => {

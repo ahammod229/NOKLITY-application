@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES } from '../types';
+import { useProducts } from '../context/ProductContext';
+import { CATEGORIES } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import StarRating from '../components/StarRating';
@@ -18,16 +19,16 @@ import QuickViewModal from '../components/QuickViewModal';
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
+  const { products } = useProducts();
   const { addToCart } = useCart();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { getReviewsForProduct, addReview } = useReview();
 
-  const initialProduct = PRODUCTS.find(p => p.id === parseInt(productId || ''));
-  const [product, setProduct] = useState<Product | undefined>(initialProduct);
+  const [product, setProduct] = useState<Product | undefined>(undefined);
 
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(product?.imageUrl);
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name);
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [isReviewModalOpen, setReviewModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
@@ -41,29 +42,31 @@ const ProductDetailPage: React.FC = () => {
   const thumbnailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const foundProduct = PRODUCTS.find(p => p.id === parseInt(productId || ''));
-    setProduct(foundProduct);
+    // Only search if products have been loaded
+    if (products.length > 0) {
+      const foundProduct = products.find(p => p.id === parseInt(productId || ''));
+      setProduct(foundProduct);
 
-    if (foundProduct) {
-      setSelectedImage(foundProduct.imageUrl);
-      setSelectedColor(foundProduct.colors?.[0]?.name);
-      setSelectedSize(null);
-      setQuantity(1);
-      
-      // Logic for Frequently Bought Together
-      const frequentlyBought = PRODUCTS.filter(
-          p => p.categoryId === foundProduct.categoryId && p.id !== foundProduct.id
-      ).slice(0, 2); // Get up to 2 products
-      setFbtProducts(frequentlyBought);
-      
-      const initialSelection: Record<number, boolean> = {};
-      frequentlyBought.forEach(p => {
-          initialSelection[p.id] = true;
-      });
-      setSelectedFbt(initialSelection);
-
+      if (foundProduct) {
+        setSelectedImage(foundProduct.imageUrl);
+        setSelectedColor(foundProduct.colors?.[0]?.name);
+        setSelectedSize(null);
+        setQuantity(1);
+        
+        // Logic for Frequently Bought Together
+        const frequentlyBought = products.filter(
+            p => p.categoryId === foundProduct.categoryId && p.id !== foundProduct.id
+        ).slice(0, 2); // Get up to 2 products
+        setFbtProducts(frequentlyBought);
+        
+        const initialSelection: Record<number, boolean> = {};
+        frequentlyBought.forEach(p => {
+            initialSelection[p.id] = true;
+        });
+        setSelectedFbt(initialSelection);
+      }
     }
-  }, [productId]);
+  }, [productId, products]);
 
   if (!product) {
     return (
@@ -76,7 +79,7 @@ const ProductDetailPage: React.FC = () => {
   
   const category = CATEGORIES.find(c => c.id === product.categoryId);
   
-  const relatedProducts = PRODUCTS.filter(
+  const relatedProducts = products.filter(
     p => p.categoryId === product.categoryId && p.id !== product.id
   ).slice(0, 4);
 
@@ -158,20 +161,21 @@ const ProductDetailPage: React.FC = () => {
 
     // Update the local product data state to make the summary reactive
     setProduct(prevProduct => {
-      if (!prevProduct?.rating?.breakdown) return prevProduct;
+      if(!prevProduct) return undefined;
+      // Initialize rating if undefined
+      const currentRating = prevProduct.rating || { count: 0, stars: 0, breakdown: { '1':0, '2':0, '3':0, '4':0, '5':0 } };
+      const currentBreakdown = currentRating.breakdown || { '1':0, '2':0, '3':0, '4':0, '5':0 };
       
-      const newRating = reviewData.rating;
-      const ratingKey = String(Math.round(newRating)) as keyof typeof prevProduct.rating.breakdown;
+      const newRatingVal = reviewData.rating;
+      const ratingKey = String(Math.round(newRatingVal)) as keyof typeof currentBreakdown;
 
       const newBreakdown = {
-        ...prevProduct.rating.breakdown,
-        [ratingKey]: (prevProduct.rating.breakdown[ratingKey] || 0) + 1,
+        ...currentBreakdown,
+        [ratingKey]: (currentBreakdown[ratingKey] || 0) + 1,
       };
 
-      const newCount = prevProduct.rating.count + 1;
+      const newCount = currentRating.count + 1;
       
-      // FIX: Cast `count` to number to resolve TypeScript error.
-      // In some environments, TypeScript may not correctly infer the type of `count` from `Object.entries`.
       const totalStars = Object.entries(newBreakdown).reduce(
           (sum, [star, count]) => sum + parseInt(star, 10) * (count as number), 0
       );
@@ -181,7 +185,7 @@ const ProductDetailPage: React.FC = () => {
       return {
         ...prevProduct,
         rating: {
-          ...prevProduct.rating,
+          ...currentRating,
           count: newCount,
           stars: newStars,
           breakdown: newBreakdown,

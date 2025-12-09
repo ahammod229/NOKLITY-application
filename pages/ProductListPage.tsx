@@ -1,16 +1,17 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// FIX: Imported constants from `types.ts` where they are defined.
-import { PRODUCTS, CATEGORIES } from '../types';
+import { useProducts } from '../context/ProductContext';
+import { CATEGORIES } from '../types';
 import ProductCard from '../components/ProductCard';
-// FIX: Imported Product type from `constants.ts` where it is defined.
 import type { Product } from '../constants';
 import QuickViewModal from '../components/QuickViewModal';
 
 const ProductListPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
+  const { products: allProducts } = useProducts();
   const category = CATEGORIES.find(c => c.id === categoryId);
-  const products: Product[] = PRODUCTS.filter(p => p.categoryId === categoryId);
+  const products: Product[] = allProducts.filter(p => p.categoryId === categoryId);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   const handleQuickView = (product: Product) => {

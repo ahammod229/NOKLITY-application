@@ -1,13 +1,14 @@
+
 import React, { useState, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { PRODUCTS, CATEGORIES } from '../types';
+import { useProducts } from '../context/ProductContext';
+import { CATEGORIES } from '../types';
 import ProductCard from '../components/ProductCard';
 import { Icon } from '../components/Icon';
 import StarRating from '../components/StarRating';
 import QuickViewModal from '../components/QuickViewModal';
 import type { Product } from '../constants';
 
-const BRANDS = [...new Set(PRODUCTS.map(p => p.brand).filter((b): b is string => !!b))].sort();
 const RATINGS = [4, 3, 2, 1];
 
 const FilterSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
@@ -26,7 +27,13 @@ const FilterSection: React.FC<{ title: string; children: React.ReactNode }> = ({
 const SearchResultsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q');
+  const { products } = useProducts();
   
+  // Calculate unique brands dynamically from current products list
+  const brands = useMemo(() => {
+      return [...new Set(products.map(p => p.brand).filter((b): b is string => !!b))].sort();
+  }, [products]);
+
   const [filters, setFilters] = useState({
     categories: [] as string[],
     brands: [] as string[],
@@ -46,11 +53,11 @@ const SearchResultsPage: React.FC = () => {
 
   const searchResults = useMemo(() => {
     return query
-      ? PRODUCTS.filter(product =>
+      ? products.filter(product =>
           product.name.toLowerCase().includes(query.toLowerCase())
         )
       : [];
-  }, [query]);
+  }, [query, products]);
 
   const filteredResults = useMemo(() => {
     let results = searchResults;
@@ -163,7 +170,7 @@ const SearchResultsPage: React.FC = () => {
               </FilterSection>
 
               <FilterSection title="Brand">
-                {BRANDS.map(brand => (
+                {brands.map(brand => (
                    <label key={brand} className="flex items-center space-x-2 cursor-pointer">
                     <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-noklity-red focus:ring-noklity-red"
                       checked={filters.brands.includes(brand)}

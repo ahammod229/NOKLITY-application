@@ -1,82 +1,57 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import { PRODUCTS as INITIAL_PRODUCTS } from '../types';
+import { PRODUCTS as initialProducts } from '../types';
 import type { Product } from '../constants';
 
 interface ProductContextType {
   products: Product[];
-  isLoading: boolean;
+  refreshProducts: () => void;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const fetchProducts = async () => {
+  const loadProducts = () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*');
-
-      if (error) {
-        console.error('Error fetching products:', error);
-        return;
+      const stored = localStorage.getItem('admin_products');
+      if (stored) {
+        setProducts(JSON.parse(stored));
+      } else {
+        // Fallback to static data if no admin data exists yet
+        setProducts(initialProducts);
+        // Optional: Initialize storage with static data so admin sees it immediately?
+        // Let's not overwrite storage automatically to avoid side effects, 
+        // admin panel handles its own initialization.
       }
-
-      if (data && data.length > 0) {
-        // Map Supabase data to Product interface
-        // Note: Ensure your Supabase schema matches or maps correctly to these fields
-        const mappedProducts: Product[] = data.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          originalPrice: item.originalPrice,
-          imageUrl: item.imageUrl,
-          categoryId: item.categoryId || 'electronics', // Default fallback
-          brand: item.brand,
-          // Add defaults for fields that might not be in simple admin form
-          colors: [],
-          sizes: [],
-          rating: { stars: 0, count: 0 },
-          freeShipping: false,
-          sold: 0
-        }));
-        
-        // Combine with initial mock products if you want to keep them, or replace them.
-        // For this demo, we'll append new products to the mock list so the site isn't empty if DB is empty.
-        // To make it fully dynamic, you would replace setProducts(mappedProducts).
-        setProducts([...INITIAL_PRODUCTS, ...mappedProducts]);
-      }
-    } catch (error) {
-      console.error('Unexpected error fetching products:', error);
-    } finally {
-      setIsLoading(false);
+    } catch (e) {
+      console.error("Failed to parse products from storage", e);
+      setProducts(initialProducts);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
 
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel('public:products')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
-        console.log('Product change received!', payload);
-        fetchProducts();
-      })
-      .subscribe();
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'admin_products') {
+        loadProducts();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // Listen for custom event for tab-internal updates if necessary
+    window.addEventListener('products-updated', loadProducts);
 
     return () => {
-      supabase.removeChannel(channel);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('products-updated', loadProducts);
     };
   }, []);
 
   return (
-    <ProductContext.Provider value={{ products, isLoading }}>
+    <ProductContext.Provider value={{ products, refreshProducts: loadProducts }}>
       {children}
     </ProductContext.Provider>
   );

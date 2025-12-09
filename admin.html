@@ -4,540 +4,1265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOKLITY Admin Panel</title>
+    <title>NOKLITY Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
             colors: {
               'noklity-red': '#E50044',
-            },
-            keyframes: {
-                'toast-in': {
-                    '0%': { transform: 'translateY(100%)', opacity: '0' },
-                    '100%': { transform: 'translateY(0)', opacity: '1' },
-                },
-                'toast-out': {
-                    '0%': { transform: 'translateY(0)', opacity: '1' },
-                    '100%': { transform: 'translateY(100%)', opacity: '0' },
-                }
-            },
-            animation: {
-                'toast-in': 'toast-in 0.3s ease-out forwards',
-                'toast-out': 'toast-out 0.3s ease-in forwards',
+              'noklity-dark': '#B90037',
             }
           }
         }
       }
     </script>
     <style>
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
-        .sidebar-link.active {
-            background-color: #FEF2F2; /* red-50 */
-            color: #E50044; /* noklity-red */
-            border-right: 3px solid #E50044;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-link { transition: all 0.2s ease-in-out; }
+        .sidebar-link:hover, .sidebar-link.active { background-color: #FEF2F2; color: #E50044; border-right: 3px solid #E50044; }
+        
+        /* Dark mode overrides */
+        .dark .sidebar-link:hover, .dark .sidebar-link.active { background-color: #374151; color: #E50044; border-right: 3px solid #E50044; }
+        .sidebar-link.active svg { color: #E50044; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none;  scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+<body class="bg-gray-50 text-gray-800 h-screen flex overflow-hidden dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-lg z-10 flex flex-col transition-all duration-300 hidden md:flex">
-        <div class="p-6 border-b flex items-center gap-3">
-             <!-- Using the same logo style as User Panel -->
-            <img src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-8 w-auto">
-            <span class="font-bold text-gray-700 text-sm tracking-widest uppercase">Admin</span>
+    <aside class="w-64 bg-white border-r border-gray-200 flex-col hidden md:flex z-20 dark:bg-gray-800 dark:border-gray-700 transition-colors duration-200">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-700">
+            <img id="admin-logo" src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-8 w-auto">
+            <span class="ml-2 text-xs font-bold text-gray-400 uppercase tracking-widest border border-gray-200 dark:border-gray-600 px-1 rounded">Admin</span>
         </div>
-        
-        <nav class="flex-1 overflow-y-auto py-4">
-            <ul class="space-y-1">
-                <li>
-                    <button onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link active w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                        </svg>
-                        Dashboard
-                    </button>
-                </li>
-                <li>
-                    <button onclick="showSection('add-product')" id="nav-add-product" class="sidebar-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Product
-                    </button>
-                </li>
-                <li>
-                    <button onclick="showSection('orders')" id="nav-orders" class="sidebar-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        Orders
-                    </button>
-                </li>
-            </ul>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-6 space-y-1">
+            <p class="px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main</p>
+            <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link active flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+            <a href="#" onclick="showSection('orders')" id="nav-orders" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                Orders
+            </a>
+
+            <p class="px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Management</p>
+            <a href="#" onclick="showSection('products')" id="nav-products" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Products
+            </a>
+            <a href="#" onclick="showSection('users')" id="nav-users" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Users & Roles
+            </a>
+            <a href="#" onclick="showSection('marketing')" id="nav-marketing" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                Banners & Ads
+            </a>
+
+            <p class="px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">System</p>
+            <a href="#" onclick="showSection('settings')" id="nav-settings" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066 2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Settings
+            </a>
         </nav>
 
-        <div class="p-4 border-t">
-            <button class="flex items-center text-gray-500 hover:text-noklity-red transition-colors text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Logout
-            </button>
+        <!-- User Profile -->
+        <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div class="flex items-center">
+                <img class="h-8 w-8 rounded-full object-cover" src="https://ui-avatars.com/api/?name=Admin+User&background=E50044&color=fff" alt="Admin">
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Ahammod Ali</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Super Admin</p>
+                </div>
+            </div>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden relative">
-        <!-- Toast Container -->
-        <div id="toast-container" class="absolute bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        
         <!-- Mobile Header -->
-        <header class="bg-white shadow-sm border-b p-4 md:hidden flex justify-between items-center">
-             <img src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-6 w-auto">
-             <button class="text-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-             </button>
+        <header class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-4 transition-colors duration-200">
+            <img src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-6 w-auto">
+            <button class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
         </header>
 
-        <!-- Content Scroll Area -->
-        <div class="flex-1 overflow-y-auto bg-gray-50 p-6 md:p-8">
+        <!-- Scrollable Content Area -->
+        <main class="flex-1 overflow-y-auto p-6">
             
-            <!-- SECTION: Dashboard -->
+            <!-- SECTION: DASHBOARD -->
             <div id="section-dashboard" class="space-y-6">
-                <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-gray-500 text-sm font-medium">Total Revenue</h3>
-                            <div class="p-2 bg-green-100 rounded-full text-green-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="text-3xl font-bold text-gray-800">৳ 124,500</p>
-                        <p class="text-green-500 text-sm mt-2 flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12 7l-5 5 1.5 1.5L12 10l5 5 1.5-1.5L12 7z" clip-rule="evenodd"></path></svg>
-                            +12% from last month
-                        </p>
-                    </div>
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
+                    <span class="text-sm text-gray-500 dark:text-gray-400" id="current-date"></span>
+                </div>
 
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-gray-500 text-sm font-medium">Total Orders</h3>
-                            <div class="p-2 bg-blue-100 rounded-full text-blue-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                            </div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Sales</h3>
+                            <span class="p-2 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800">1,245</p>
-                        <p class="text-blue-500 text-sm mt-2">56 pending orders</p>
+                        <p class="text-2xl font-bold text-gray-800 dark:text-white" id="stat-total-sales">৳ 0</p>
                     </div>
-
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-gray-500 text-sm font-medium">Products</h3>
-                            <div class="p-2 bg-orange-100 rounded-full text-orange-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                </svg>
-                            </div>
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">New Orders</h3>
+                            <span class="p-2 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg></span>
                         </div>
-                        <p class="text-3xl font-bold text-gray-800">89</p>
-                        <p class="text-gray-500 text-sm mt-2">Active listings</p>
+                        <p class="text-2xl font-bold text-gray-800 dark:text-white" id="stat-new-orders">0</p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Products</h3>
+                            <span class="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></span>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-800 dark:text-white" id="total-products-count">0</p>
+                    </div>
+                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Users</h3>
+                            <span class="p-2 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></span>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-800 dark:text-white" id="total-users-count">4</p>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Preview -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white">Recent Orders</h2>
+                        <button onclick="showSection('orders')" class="text-sm text-noklity-red hover:underline">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                         <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">Order ID</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Customer</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Total</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm" id="dashboard-orders-preview">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            <!-- SECTION: Add Product -->
-            <div id="section-add-product" class="space-y-6 hidden">
-                <h1 class="text-2xl font-bold text-gray-800">Add New Product</h1>
+            <!-- SECTION: PRODUCTS -->
+            <div id="section-products" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Product Management</h1>
+                    <button onclick="toggleProductModal(true)" class="bg-noklity-red hover:bg-noklity-dark text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Product
+                    </button>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                     <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                <th class="px-6 py-3 font-medium uppercase">Product</th>
+                                <th class="px-6 py-3 font-medium uppercase">Category</th>
+                                <th class="px-6 py-3 font-medium uppercase">Price</th>
+                                <th class="px-6 py-3 font-medium uppercase text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list-body" class="text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECTION: USERS -->
+            <div id="section-users" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">User Management</h1>
+                    <button onclick="toggleUserModal(true)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                        Add User
+                    </button>
+                </div>
                 
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl">
-                    <form id="productForm" class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                            <input type="text" id="p-name" required
-                                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
-                                placeholder="e.g., Wireless Gaming Mouse">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-700/30">
+                        <div class="relative w-full max-w-sm">
+                            <input type="text" id="user-search" placeholder="Search users..." oninput="filterUsers(this.value)" class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-noklity-red bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">User</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Role</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Status</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Joined</th>
+                                    <th class="px-6 py-3 font-medium uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list-body" class="text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="grid grid-cols-2 gap-6">
+            <!-- SECTION: ORDERS -->
+            <div id="section-orders" class="space-y-6 hidden">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Order Management</h1>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">Order ID</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Items</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Total</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Status</th>
+                                    <th class="px-6 py-3 font-medium uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-list-body" class="text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: MARKETING (BANNERS) -->
+            <div id="section-marketing" class="space-y-6 hidden">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Marketing & Banners</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Upload Banner -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Add Homepage Banner</h2>
+                        <form id="bannerForm" class="space-y-4">
+                            
+                            <!-- Location Select -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (৳)</label>
-                                <input type="number" id="p-price" required
-                                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
-                                    placeholder="0.00">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Banner Placement</label>
+                                <select id="banner-location" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                    <option value="Home Slider">Homepage Main Slider</option>
+                                    <option value="Sidebar Ad">Sidebar Advertisement</option>
+                                    <option value="Footer Promo">Footer Promo Section</option>
+                                    <option value="Category Page">Category Page Top</option>
+                                </select>
                             </div>
+
+                            <!-- Banner Image Section -->
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Original Price (Optional)</label>
-                                <input type="number" id="p-original-price"
-                                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
-                                    placeholder="0.00">
-                            </div>
-                        </div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Banner Image</label>
+                                
+                                <!-- Toggle Options -->
+                                <div class="flex items-center space-x-4 mb-3">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="banner-type" value="url" checked class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleBannerInput('url')">
+                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Image URL</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="banner-type" value="file" class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleBannerInput('file')">
+                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Upload File</span>
+                                    </label>
+                                </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                            <textarea id="p-desc" rows="4" required
-                                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
-                                placeholder="Product details..."></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                            <div class="mt-1 flex justify-center px-6 py-6 border-2 border-gray-300 border-dashed rounded-md hover:border-noklity-red transition-colors cursor-pointer bg-gray-50" id="drop-zone">
-                                <div class="space-y-1 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                    <div class="flex text-sm text-gray-600 justify-center">
-                                        <label for="p-image" class="relative cursor-pointer rounded-md font-medium text-noklity-red hover:text-red-700 focus-within:outline-none">
-                                            <span>Upload a file</span>
-                                            <input id="p-image" name="p-image" type="file" accept="image/*" class="sr-only" required onchange="previewImage(this)">
-                                        </label>
-                                        <p class="pl-1">or drag and drop</p>
+                                <div class="flex gap-4 items-start">
+                                    <!-- URL Input -->
+                                    <div id="banner-url-container" class="flex-1">
+                                        <input type="url" id="banner-url" placeholder="https://..." oninput="updateBannerPreview(this.value)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
                                     </div>
-                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+
+                                    <!-- File Input (Hidden by default) -->
+                                    <div id="banner-file-container" class="flex-1 hidden">
+                                        <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                            <div class="flex items-center justify-center space-x-2">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                                <span class="text-xs text-gray-500 dark:text-gray-400">Upload Banner</span>
+                                            </div>
+                                            <input id="banner-file" type="file" class="hidden" accept="image/*" onchange="handleBannerUpload(this)">
+                                        </label>
+                                    </div>
+
+                                    <!-- Preview Box -->
+                                    <div class="h-10 border border-gray-200 dark:border-gray-600 p-1 rounded bg-white dark:bg-gray-700 object-contain flex items-center justify-center overflow-hidden w-auto min-w-[80px]">
+                                        <img id="banner-preview" src="" class="h-full w-auto hidden">
+                                        <span id="banner-no-img" class="text-[10px] text-gray-400 text-center">Preview</span>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Image Preview -->
-                            <div id="image-preview-container" class="mt-4 hidden">
-                                <p class="text-sm font-medium text-gray-700 mb-2">Selected Image:</p>
-                                <img id="image-preview" src="#" alt="Preview" class="h-32 w-32 object-cover rounded-md border">
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Link (Optional)</label>
+                                <input type="text" id="banner-link" placeholder="/category/electronics" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red focus:border-transparent outline-none transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            </div>
+                            <button type="submit" class="w-full bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-medium py-2 rounded-lg transition-colors">Add Banner</button>
+                        </form>
+                    </div>
+
+                    <!-- Active Banners List -->
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Active Banners</h2>
+                        <div id="banner-list" class="space-y-3">
+                            <!-- Banners will appear here -->
+                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">No banners active.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: SETTINGS -->
+            <div id="section-settings" class="space-y-6 hidden">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Site Settings</h1>
+                
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 max-w-2xl transition-colors">
+                    <form id="settingsForm" class="space-y-6">
+                        
+                        <!-- Theme Toggle -->
+                        <div class="flex items-center justify-between pb-6 border-b border-gray-100 dark:border-gray-700">
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800 dark:text-white">Theme Preference</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Choose between light and dark mode for the admin panel.</p>
+                            </div>
+                            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 border border-gray-200 dark:border-gray-600">
+                                <button type="button" onclick="setTheme('light')" id="btn-theme-light" class="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                </button>
+                                <button type="button" onclick="setTheme('dark')" id="btn-theme-dark" class="p-2 rounded-full text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                                </button>
                             </div>
                         </div>
 
-                        <div class="pt-4">
-                            <button type="submit" id="btn-submit"
-                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-noklity-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-noklity-red transition-colors disabled:opacity-50">
-                                Create Product
-                            </button>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Site Name</label>
+                            <input type="text" id="site-name" value="NOKLITY" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                        </div>
+                        
+                        <!-- Logo Upload Section -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Logo</label>
+                            
+                            <!-- Toggle Options -->
+                            <div class="flex items-center space-x-4 mb-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="logo-type" value="url" checked class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleLogoInput('url')">
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Image URL</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="logo-type" value="file" class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleLogoInput('file')">
+                                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Upload File</span>
+                                </label>
+                            </div>
+
+                            <div class="flex gap-4 items-start">
+                                <!-- URL Input -->
+                                <div id="logo-url-container" class="flex-1">
+                                    <input type="url" id="site-logo-url" value="https://i.ibb.co/p3wACj8/noklity-logo.png" oninput="updateLogoPreview(this.value)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                                </div>
+
+                                <!-- File Input (Hidden by default) -->
+                                <div id="logo-file-container" class="flex-1 hidden">
+                                    <label class="flex flex-col items-center justify-center w-full h-12 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <div class="flex items-center justify-center space-x-2">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400">Upload Logo</span>
+                                        </div>
+                                        <input id="site-logo-file" type="file" class="hidden" accept="image/*" onchange="handleLogoUpload(this)">
+                                    </label>
+                                </div>
+
+                                <!-- Preview -->
+                                <div class="h-10 border border-gray-200 dark:border-gray-600 p-1 rounded bg-white object-contain flex items-center justify-center overflow-hidden w-auto min-w-[80px]">
+                                    <img id="settings-logo-preview" src="https://i.ibb.co/p3wACj8/noklity-logo.png" class="h-full w-auto">
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended size: 200x50px (PNG)</p>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <button type="submit" class="bg-noklity-red text-white font-medium px-6 py-2 rounded-lg hover:bg-noklity-dark transition-colors shadow-lg shadow-red-100 dark:shadow-none">Save Changes</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- SECTION: Orders -->
-            <div id="section-orders" class="space-y-6 hidden">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold text-gray-800">Orders</h1>
-                    <button class="text-sm text-noklity-red font-medium hover:underline" onclick="fetchOrders()">Refresh Data</button>
-                </div>
-                
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="relative px-6 py-3">
-                                        <span class="sr-only">Actions</span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
-                                <!-- JS will populate this -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Empty State for Orders -->
-                    <div id="orders-empty" class="hidden text-center py-10">
-                        <p class="text-gray-500">No orders found.</p>
-                    </div>
-                </div>
-            </div>
+        </main>
+    </div>
 
+    <!-- ADD PRODUCT MODAL -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
+                <button onclick="toggleProductModal(false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="addProductForm" class="p-6 space-y-5">
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name</label>
+                        <input type="text" id="p-name" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Price (৳)</label>
+                        <input type="number" id="p-price" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Original Price (Optional)</label>
+                        <input type="number" id="p-original" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                        <select id="p-category" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                            <option value="electronics">Electronics</option>
+                            <option value="tools">Tools</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="health">Health & Beauty</option>
+                            <option value="tyres">Tyres</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Brand</label>
+                        <input type="text" id="p-brand" placeholder="e.g. Samsung" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                    </div>
+                    
+                    <!-- PRODUCT IMAGE SECTION -->
+                    <div class="col-span-2">
+                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Product Image</label>
+                         
+                         <!-- Toggle Options -->
+                         <div class="flex items-center space-x-4 mb-3">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="image-type" value="url" checked class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleImageInput('url')">
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Image URL</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="image-type" value="file" class="text-noklity-red focus:ring-noklity-red accent-noklity-red" onchange="toggleImageInput('file')">
+                                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Upload File</span>
+                            </label>
+                        </div>
+
+                         <div class="flex gap-4 items-start">
+                             <!-- URL Input -->
+                             <div id="input-url-container" class="flex-1">
+                                 <input type="url" id="p-image-url" placeholder="https://example.com/image.png" oninput="updateImagePreview(this.value)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                             </div>
+
+                             <!-- File Input (Hidden by default) -->
+                             <div id="input-file-container" class="flex-1 hidden">
+                                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Click to upload (PNG, JPG)</p>
+                                    </div>
+                                    <input id="p-image-file" type="file" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
+                                </label>
+                             </div>
+
+                             <!-- Preview Box -->
+                             <div class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                                 <img id="image-preview" src="" class="w-full h-full object-cover hidden">
+                                 <span id="no-image-text" class="text-xs text-gray-400 text-center px-1">Preview</span>
+                                 <button type="button" onclick="clearImage()" id="clear-image-btn" class="absolute top-1 right-1 bg-white rounded-full p-1 shadow-sm hidden hover:text-red-500">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                 </button>
+                             </div>
+                         </div>
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                        <textarea id="p-desc" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-noklity-red outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white"></textarea>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
+                    <button type="button" onclick="toggleProductModal(false)" class="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-noklity-red text-white font-medium rounded-lg hover:bg-noklity-dark transition-colors shadow-lg shadow-red-200 dark:shadow-none">Save Product</button>
+                </div>
+            </form>
         </div>
-    </main>
+    </div>
+
+    <!-- ADD/EDIT USER MODAL -->
+    <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto transition-colors">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 sticky top-0 z-10">
+                <h2 id="userModalTitle" class="text-xl font-bold text-gray-800 dark:text-white">Add New User</h2>
+                <button onclick="toggleUserModal(false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="addUserForm" class="p-6 space-y-5">
+                <input type="hidden" id="u-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+                    <input type="text" id="u-name" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                    <input type="email" id="u-email" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+                    <select id="u-role" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                        <option value="Customer">Customer</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Editor">Editor</option>
+                    </select>
+                </div>
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
+                    <button type="button" onclick="toggleUserModal(false)" class="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
+                    <button id="userModalBtn" type="submit" class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-100 dark:shadow-none">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
+        <span id="toast-msg">Notification</span>
+    </div>
 
     <script>
-        // ==========================================
-        // 1. SUPABASE INITIALIZATION
-        // ==========================================
-        // IMPORTANT: Replace these with your actual Supabase project URL and Anon Key
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        
-        let supabase;
+        // ================= DATE =================
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-        // Factory for a safe mock client to use when credentials are invalid
-        function createMockClient() {
-             return {
-                from: () => ({ select: () => ({ data: [], error: null, order: () => ({ data: [], error: null }) }), insert: () => ({ error: null }) }),
-                storage: { from: () => ({ upload: () => ({ data: { path: 'test' }, error: null }), getPublicUrl: () => ({ data: { publicUrl: '#' } }) }) },
-                channel: () => ({ on: () => ({ subscribe: () => {} }) })
-            };
-        }
-
-        try {
-            // Check if URL is present and valid before creating client
-            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // ================= THEME LOGIC =================
+        function setTheme(theme) {
+            const html = document.documentElement;
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                document.getElementById('btn-theme-dark').classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                document.getElementById('btn-theme-dark').classList.remove('text-gray-500', 'dark:text-gray-400');
+                document.getElementById('btn-theme-light').classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                document.getElementById('btn-theme-light').classList.add('text-gray-500');
+                localStorage.setItem('admin_theme', 'dark');
             } else {
-                console.warn('Supabase not configured or invalid URL. Using mock client.');
-                supabase = createMockClient();
+                html.classList.remove('dark');
+                document.getElementById('btn-theme-light').classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                document.getElementById('btn-theme-light').classList.remove('text-gray-500');
+                document.getElementById('btn-theme-dark').classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                document.getElementById('btn-theme-dark').classList.add('text-gray-500', 'dark:text-gray-400');
+                localStorage.setItem('admin_theme', 'light');
             }
-        } catch (e) {
-            console.error('Supabase Init Error:', e);
-            // Fallback to mock client on error
-            supabase = createMockClient();
         }
 
-        // ==========================================
-        // 2. TOAST NOTIFICATION SYSTEM
-        // ==========================================
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            // Define styles based on type
-            let bgColorClass = 'bg-gray-800';
-            let iconSvg = '';
+        // Init Theme
+        const savedTheme = localStorage.getItem('admin_theme') || 'light';
+        setTheme(savedTheme);
 
-            if (type === 'success') {
-                bgColorClass = 'bg-green-600';
-                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            } else if (type === 'error') {
-                bgColorClass = 'bg-red-600';
-                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            } else {
-                // Info / Warning
-                bgColorClass = 'bg-gray-800';
-                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-            }
 
-            toast.className = `flex items-center w-full max-w-sm p-4 text-white rounded-lg shadow-lg pointer-events-auto animate-toast-in ${bgColorClass}`;
-            toast.innerHTML = `
-                <div class="flex-shrink-0">
-                    ${iconSvg}
-                </div>
-                <div class="ml-3 text-sm font-medium">
-                    ${message}
-                </div>
-                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-white hover:text-gray-200 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-white/10 inline-flex h-8 w-8" aria-label="Close" onclick="this.parentElement.remove()">
-                    <span class="sr-only">Close</span>
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                </button>
-            `;
-
-            container.appendChild(toast);
-
-            // Auto-remove after 4 seconds
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.classList.remove('animate-toast-in');
-                    toast.classList.add('animate-toast-out');
-                    toast.addEventListener('animationend', () => {
-                        toast.remove();
-                    });
-                }
-            }, 4000);
-        }
-
-        // ==========================================
-        // 3. NAVIGATION LOGIC
-        // ==========================================
+        // ================= NAVIGATION =================
         function showSection(sectionId) {
             // Hide all sections
-            document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+            ['dashboard', 'products', 'orders', 'marketing', 'settings', 'users'].forEach(id => {
+                const sec = document.getElementById('section-' + id);
+                if(sec) sec.classList.add('hidden');
+                
+                const navItem = document.getElementById('nav-' + id);
+                if(navItem) navItem.classList.remove('active');
+            });
             
-            // Show selected section
-            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            // Show selected
+            const target = document.getElementById('section-' + sectionId);
+            if(target) target.classList.remove('hidden');
+            
+            const targetNav = document.getElementById('nav-' + sectionId);
+            if(targetNav) targetNav.classList.add('active');
 
-            // Update sidebar active state
-            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${sectionId}`).classList.add('active');
+            if (sectionId === 'products') renderProducts();
+            if (sectionId === 'marketing') renderBanners();
+            if (sectionId === 'users') renderUsers();
+            if (sectionId === 'orders') renderOrders();
+        }
 
-            if(sectionId === 'orders') {
-                fetchOrders();
+        // ================= STATE MANAGEMENT & SYNC =================
+        const initialProducts = [
+            { id: 101, name: 'Weidasi WD-959 Mosquito Bat', category: 'electronics', price: 549, image: 'https://i.ibb.co/gJFJHJq/mosquito-bat.png' },
+            { id: 102, name: 'LG Plus 32 Smart TV', category: 'electronics', price: 14100, image: 'https://i.ibb.co/4T7gHqN/tv.png' }
+        ];
+        const initialUsers = [
+            { id: 1, name: 'Ahammod Ali', email: 'ahammod@example.com', role: 'Super Admin', status: 'active', date: '2023-10-01' },
+            { id: 2, name: 'Karim Ullah', email: 'karim@test.com', role: 'Customer', status: 'active', date: '2023-10-05' },
+            { id: 3, name: 'Rahim Ahmed', email: 'rahim@test.com', role: 'Customer', status: 'blocked', date: '2023-10-12' },
+            { id: 4, name: 'Salam Miah', email: 'salam@test.com', role: 'Customer', status: 'active', date: '2023-10-15' }
+        ];
+
+        let productsState = [];
+        let usersState = [];
+        let bannersState = [];
+        let ordersState = [];
+
+        // Global uploaded images
+        let uploadedProductImage = null;
+        let uploadedLogoImage = null;
+        let uploadedBannerImage = null;
+
+        function loadData() {
+            productsState = JSON.parse(localStorage.getItem('admin_products') || JSON.stringify(initialProducts));
+            usersState = JSON.parse(localStorage.getItem('admin_users') || JSON.stringify(initialUsers));
+            bannersState = JSON.parse(localStorage.getItem('admin_banners') || '[]');
+            ordersState = JSON.parse(localStorage.getItem('admin_orders') || '[]');
+            
+            updateStats();
+            
+            // Re-render active view if needed
+            const activeSection = document.querySelector('.sidebar-link.active');
+            if (activeSection) {
+                const sectionId = activeSection.id.replace('nav-', '');
+                if (sectionId === 'products') renderProducts();
+                if (sectionId === 'users') renderUsers();
+                if (sectionId === 'marketing') renderBanners();
+                if (sectionId === 'orders') renderOrders();
+                if (sectionId === 'dashboard') renderDashboardPreview();
             }
         }
 
-        // ==========================================
-        // 4. ADD PRODUCT LOGIC
-        // ==========================================
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('image-preview').src = e.target.result;
-                    document.getElementById('image-preview-container').classList.remove('hidden');
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        document.getElementById('productForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-submit');
-            const originalBtnText = btn.textContent;
-            
-            btn.textContent = 'Uploading...';
-            btn.disabled = true;
-
-            const name = document.getElementById('p-name').value;
-            const price = parseFloat(document.getElementById('p-price').value);
-            const originalPrice = document.getElementById('p-original-price').value ? parseFloat(document.getElementById('p-original-price').value) : null;
-            const description = document.getElementById('p-desc').value;
-            const imageFile = document.getElementById('p-image').files[0];
-
-            try {
-                if (!imageFile) {
-                    throw new Error("Please select a product image.");
-                }
-
-                // 1. Upload Image to Supabase Storage
-                // Ensure you have a bucket named 'images' in Supabase Storage and it is Public
-                const fileName = `product_${Date.now()}_${imageFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`; // Sanitize filename
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('images') // Make sure this bucket exists
-                    .upload(fileName, imageFile);
-
-                if (uploadError) {
-                    console.error("Storage Upload Error:", uploadError);
-                    throw new Error(`Image upload failed: ${uploadError.message}. Check if 'images' bucket exists and has public policies.`);
-                }
-
-                // 2. Get Public URL
-                const { data: publicUrlData } = supabase.storage
-                    .from('images')
-                    .getPublicUrl(fileName);
-
-                const imageUrl = publicUrlData.publicUrl;
-
-                // 3. Insert into Database
-                const { error: dbError } = await supabase
-                    .from('products')
-                    .insert([
-                        { name, price, originalPrice, description, imageUrl, categoryId: 'electronics' } // Default cat for demo
-                    ]);
-
-                if (dbError) {
-                    console.error("Database Insert Error:", dbError);
-                    throw new Error(`Database insertion failed: ${dbError.message}`);
-                }
-
-                showToast('Product added successfully!', 'success');
-                document.getElementById('productForm').reset();
-                document.getElementById('image-preview-container').classList.add('hidden');
-
-            } catch (error) {
-                console.error('Error adding product:', error);
-                showToast(error.message || 'An unexpected error occurred.', 'error');
-            } finally {
-                btn.textContent = originalBtnText;
-                btn.disabled = false;
+        // Live Sync Listener
+        window.addEventListener('storage', (e) => {
+            if(['admin_products', 'admin_users', 'admin_banners', 'admin_orders'].includes(e.key)) {
+                loadData();
+                showToast("Data updated from another tab.", "info");
             }
         });
 
-        // ==========================================
-        // 5. ORDERS LOGIC
-        // ==========================================
-        async function fetchOrders() {
-            const tbody = document.getElementById('orders-table-body');
-            const emptyState = document.getElementById('orders-empty');
-            
-            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading orders...</td></tr>';
+        // Initial Load
+        loadData();
 
+        // ================= UTILS: COMPRESSION =================
+        function compressImage(file, maxWidth, quality, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth) {
+                        height = Math.round((height *= maxWidth / width));
+                        width = maxWidth;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', quality));
+                };
+            };
+        }
+
+        // ================= PRODUCT LOGIC =================
+        function saveProducts() {
             try {
-                const { data: orders, error } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                localStorage.setItem('admin_products', JSON.stringify(productsState));
+                window.dispatchEvent(new Event('storage')); // Notify self
+            } catch (e) {
+                console.error("Storage limit exceeded", e);
+                showToast("Storage full! Saved temporarily.", "error");
+            }
+            renderProducts();
+            updateStats();
+        }
 
-                if (error) {
-                    console.error("Fetch Orders Error:", error);
-                    throw new Error(error.message);
-                }
+        function renderProducts() {
+            const tbody = document.getElementById('product-list-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            productsState.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 flex items-center">
+                        <img src="${p.image}" class="w-10 h-10 rounded object-contain border border-gray-200 dark:border-gray-600 bg-white">
+                        <span class="ml-3 font-medium text-gray-900 dark:text-white truncate max-w-xs">${p.name}</span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300 capitalize">${p.category}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">৳ ${p.price}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 text-sm font-medium">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
 
-                tbody.innerHTML = ''; // Clear loading
-
-                if (!orders || orders.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-
-                emptyState.classList.add('hidden');
-
-                orders.forEach(order => {
-                    // Safe access to properties in case database schema differs slightly
-                    const orderId = order.id || 'N/A';
-                    const customerName = order.customer_name || 'Guest';
-                    const itemCount = order.items ? order.items.length : 0;
-                    const total = order.total ? order.total.toLocaleString() : '0';
-                    const status = order.status || 'Pending';
-
-                    const row = `
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${orderId}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customerName}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${itemCount} Items</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">৳ ${total}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    ${status === 'Completed' ? 'bg-green-100 text-green-800' : 
-                                      status === 'To ship' ? 'bg-orange-100 text-orange-800' : 
-                                      'bg-gray-100 text-gray-800'}">
-                                    ${status}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button class="text-noklity-red hover:text-red-900 font-medium transition-colors">Manage</button>
-                            </td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500 font-medium">Failed to load orders.</td></tr>';
-                showToast(`Failed to load orders: ${error.message}`, 'error');
+        function toggleProductModal(show) {
+            const modal = document.getElementById('productModal');
+            if (show) modal.classList.remove('hidden');
+            else {
+                modal.classList.add('hidden');
+                clearImage(); 
             }
         }
 
-        // ==========================================
-        // 6. REALTIME SUBSCRIPTION
-        // ==========================================
-        // Subscribe to changes in the 'orders' table
-        if (supabase.channel) {
-            const channel = supabase.channel('realtime:orders')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
-                    console.log('New order received!', payload);
-                    fetchOrders(); // Refresh table data
-                    showToast('New order received!', 'success');
-                })
-                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
-                     console.log('Order updated!', payload);
-                     fetchOrders(); // Refresh table data
-                })
-                .subscribe();
+        function toggleImageInput(type) {
+            const urlContainer = document.getElementById('input-url-container');
+            const fileContainer = document.getElementById('input-file-container');
+            const urlInput = document.getElementById('p-image-url');
+            
+            if(type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                urlInput.required = true;
+                updateImagePreview(urlInput.value);
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                urlInput.required = false;
+                updateImagePreview(uploadedProductImage || '');
+            }
+        }
+
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                compressImage(input.files[0], 400, 0.7, (base64) => {
+                    uploadedProductImage = base64;
+                    updateImagePreview(uploadedProductImage);
+                });
+            }
+        }
+
+        function updateImagePreview(src) {
+            const img = document.getElementById('image-preview');
+            const placeholder = document.getElementById('no-image-text');
+            const clearBtn = document.getElementById('clear-image-btn');
+
+            if(src && src.trim() !== '') {
+                img.src = src;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                clearBtn.classList.remove('hidden');
+            } else {
+                img.src = '';
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                clearBtn.classList.add('hidden');
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('p-image-url').value = '';
+            document.getElementById('p-image-file').value = '';
+            uploadedProductImage = null;
+            updateImagePreview('');
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const isUrlMode = document.querySelector('input[name="image-type"]:checked').value === 'url';
+            let finalImage = isUrlMode ? document.getElementById('p-image-url').value : uploadedProductImage;
+
+            if (!isUrlMode && !uploadedProductImage) {
+                alert("Please upload an image file.");
+                return;
+            }
+
+            const newProduct = {
+                id: Date.now(),
+                name: document.getElementById('p-name').value,
+                price: parseFloat(document.getElementById('p-price').value),
+                originalPrice: parseFloat(document.getElementById('p-original').value) || null,
+                category: document.getElementById('p-category').value,
+                image: finalImage,
+                brand: document.getElementById('p-brand').value,
+                description: document.getElementById('p-desc').value
+            };
+            
+            productsState.push(newProduct);
+            saveProducts();
+            toggleProductModal(false);
+            e.target.reset();
+            clearImage();
+            showToast('Product added successfully!');
+        });
+
+        function deleteProduct(id) {
+            if(confirm('Are you sure?')) {
+                productsState = productsState.filter(p => p.id !== id);
+                saveProducts();
+                showToast('Product deleted.');
+            }
+        }
+
+        // ================= ORDER LOGIC =================
+        function saveOrders() {
+            localStorage.setItem('admin_orders', JSON.stringify(ordersState));
+            window.dispatchEvent(new Event('storage'));
+            renderOrders();
+            renderDashboardPreview();
+            updateStats();
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('orders-list-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            if (ordersState.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found.</td></tr>';
+                return;
+            }
+
+            ordersState.forEach(order => {
+                const total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                
+                let statusColor = 'bg-gray-100 text-gray-800';
+                if(order.status === 'Completed') statusColor = 'bg-green-100 text-green-800';
+                if(order.status === 'To ship') statusColor = 'bg-orange-100 text-orange-800';
+                if(order.status === 'Cancelled') statusColor = 'bg-red-100 text-red-800';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">#${order.id}</td>
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300 text-xs">
+                        ${order.items.map(i => `<div class="truncate max-w-[200px]">${i.quantity}x ${i.name}</div>`).join('')}
+                    </td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">৳ ${total}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusColor}">${order.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs border rounded p-1 bg-white dark:bg-gray-700 dark:text-white">
+                            <option value="To ship" ${order.status === 'To ship' ? 'selected' : ''}>To ship</option>
+                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateOrderStatus(id, newStatus) {
+            const order = ordersState.find(o => o.id === id);
+            if(order) {
+                order.status = newStatus;
+                saveOrders();
+                showToast(`Order #${id} updated to ${newStatus}`);
+            }
+        }
+
+        function renderDashboardPreview() {
+            const tbody = document.getElementById('dashboard-orders-preview');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            const recentOrders = ordersState.slice(0, 5); // Show last 5
+            
+            if (recentOrders.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No recent orders.</td></tr>';
+                 return;
+            }
+
+            recentOrders.forEach(order => {
+                const total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">#${order.id}</td>
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Customer</td>
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">৳ ${total}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-xs font-semibold">${order.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+
+        // ================= SETTINGS LOGIC (With Logo Upload) =================
+        
+        function toggleLogoInput(type) {
+            const urlContainer = document.getElementById('logo-url-container');
+            const fileContainer = document.getElementById('logo-file-container');
+            const urlInput = document.getElementById('site-logo-url');
+            
+            if(type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                updateLogoPreview(urlInput.value);
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                updateLogoPreview(uploadedLogoImage || '');
+            }
+        }
+
+        function handleLogoUpload(input) {
+            if (input.files && input.files[0]) {
+                compressImage(input.files[0], 200, 0.8, (base64) => {
+                    uploadedLogoImage = base64;
+                    updateLogoPreview(uploadedLogoImage);
+                });
+            }
+        }
+
+        function updateLogoPreview(src) {
+            const img = document.getElementById('settings-logo-preview');
+            if(src && src.trim() !== '') {
+                img.src = src;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+        }
+
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const isUrlMode = document.querySelector('input[name="logo-type"]:checked').value === 'url';
+            let finalLogo = isUrlMode ? document.getElementById('site-logo-url').value : uploadedLogoImage;
+            
+            if (!isUrlMode && !uploadedLogoImage) {
+                // If switching to file but no file uploaded, fallback to current or empty
+                finalLogo = document.getElementById('admin-logo').src; 
+            }
+
+            // Apply Changes
+            document.getElementById('admin-logo').src = finalLogo;
+            showToast('Settings saved successfully!');
+        });
+
+
+        // ================= USER MANAGEMENT LOGIC (EDIT IMPLEMENTED) =================
+        
+        function saveUsers() {
+            try {
+                localStorage.setItem('admin_users', JSON.stringify(usersState));
+                window.dispatchEvent(new Event('storage'));
+            } catch (e) {
+                showToast("Storage full! User changes saved temporarily.", "error");
+            }
+            renderUsers();
+            updateStats();
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('user-list-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            // Get filter text
+            const searchInput = document.getElementById('user-search');
+            const filterText = searchInput ? searchInput.value.toLowerCase() : '';
+
+            const filteredUsers = usersState.filter(u => 
+                u.name.toLowerCase().includes(filterText) || 
+                u.email.toLowerCase().includes(filterText)
+            );
+
+            filteredUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors';
+                
+                let statusBadge = '';
+                if(u.status === 'active') statusBadge = '<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-semibold">Active</span>';
+                else statusBadge = '<span class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full text-xs font-semibold">Blocked</span>';
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-gray-500 dark:text-gray-300 font-bold uppercase">
+                                ${u.name.charAt(0)}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900 dark:text-white">${u.name}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">${u.email}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300 text-sm">${u.role}</td>
+                    <td class="px-6 py-4">${statusBadge}</td>
+                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-sm">${u.date}</td>
+                    <td class="px-6 py-4 text-center">
+                        ${u.role !== 'Super Admin' ? `
+                            <button onclick="editUser(${u.id})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs font-medium mr-3 transition-colors">Edit</button>
+                            <button onclick="toggleUserStatus(${u.id})" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-xs font-medium mr-3 transition-colors">
+                                ${u.status === 'active' ? 'Block' : 'Unblock'}
+                            </button>
+                            <button onclick="deleteUser(${u.id})" class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium transition-colors">Delete</button>
+                        ` : '<span class="text-xs text-gray-400 italic">Locked</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Toggle User Modal (Handles both Add and Edit)
+        function toggleUserModal(show, userToEdit = null) {
+            const modal = document.getElementById('userModal');
+            const title = document.getElementById('userModalTitle');
+            const btn = document.getElementById('userModalBtn');
+            const form = document.getElementById('addUserForm');
+
+            if (show) {
+                modal.classList.remove('hidden');
+                if (userToEdit) {
+                    // Edit Mode
+                    title.innerText = "Edit User";
+                    btn.innerText = "Update User";
+                    document.getElementById('u-id').value = userToEdit.id;
+                    document.getElementById('u-name').value = userToEdit.name;
+                    document.getElementById('u-email').value = userToEdit.email;
+                    document.getElementById('u-role').value = userToEdit.role;
+                } else {
+                    // Add Mode
+                    title.innerText = "Add New User";
+                    btn.innerText = "Create User";
+                    form.reset();
+                    document.getElementById('u-id').value = ""; // Clear ID
+                }
+            } else {
+                modal.classList.add('hidden');
+                form.reset();
+            }
+        }
+
+        // Edit User Trigger
+        function editUser(id) {
+            const user = usersState.find(u => u.id === id);
+            if (user) {
+                toggleUserModal(true, user);
+            }
+        }
+
+        // Add/Edit User Handler
+        document.getElementById('addUserForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('u-id').value;
+            const name = document.getElementById('u-name').value;
+            const email = document.getElementById('u-email').value;
+            const role = document.getElementById('u-role').value;
+
+            if (userId) {
+                // UPDATE Existing User
+                const index = usersState.findIndex(u => u.id == userId);
+                if (index !== -1) {
+                    usersState[index].name = name;
+                    usersState[index].email = email;
+                    usersState[index].role = role;
+                    showToast('User updated successfully!');
+                }
+            } else {
+                // CREATE New User
+                const newUser = {
+                    id: Date.now(),
+                    name: name,
+                    email: email,
+                    role: role,
+                    status: 'active',
+                    date: new Date().toISOString().split('T')[0]
+                };
+                usersState.push(newUser);
+                showToast('User added successfully!');
+            }
+
+            saveUsers();
+            toggleUserModal(false);
+        });
+
+        // Filter Handler
+        function filterUsers(query) {
+            renderUsers(); // The render function uses the input value directly
+        }
+
+        function toggleUserStatus(id) {
+            const userIndex = usersState.findIndex(u => u.id === id);
+            if(userIndex !== -1) {
+                const user = usersState[userIndex];
+                user.status = user.status === 'active' ? 'blocked' : 'active';
+                usersState[userIndex] = user; // Update state
+                saveUsers();
+                showToast(`User ${user.status === 'active' ? 'unblocked' : 'blocked'}.`);
+            }
+        }
+
+        function deleteUser(id) {
+            if(confirm('Delete user permanently? This action cannot be undone.')) {
+                usersState = usersState.filter(u => u.id !== id);
+                saveUsers();
+                showToast('User deleted successfully.');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('total-products-count').innerText = productsState.length;
+            document.getElementById('total-users-count').innerText = usersState.length;
+            document.getElementById('stat-new-orders').innerText = ordersState.length;
+            
+            // Calculate Total Sales
+            const totalSales = ordersState.reduce((acc, order) => {
+                const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                return acc + orderTotal;
+            }, 0);
+            document.getElementById('stat-total-sales').innerText = `৳ ${totalSales.toLocaleString()}`;
+        }
+
+        // ================= BANNER LOGIC (UPDATED WITH UPLOAD) =================
+        function saveBanners() {
+            try {
+                localStorage.setItem('admin_banners', JSON.stringify(bannersState));
+                window.dispatchEvent(new Event('storage'));
+            } catch (e) {
+                showToast("Storage full! Banners saved temporarily.", "error");
+            }
+            renderBanners();
+        }
+
+        function renderBanners() {
+            const container = document.getElementById('banner-list');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            if (bannersState.length === 0) {
+                container.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 italic">No banners active.</p>';
+                return;
+            }
+
+            bannersState.forEach((b, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${b.image}" class="h-10 w-20 object-cover rounded border dark:border-gray-600 bg-white">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-noklity-red uppercase tracking-wider">${b.location || 'General'}</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[150px]">${b.link || 'No Link'}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteBanner(${index})" class="text-red-500 hover:text-red-700 dark:text-red-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Toggle Banner Input
+        function toggleBannerInput(type) {
+            const urlContainer = document.getElementById('banner-url-container');
+            const fileContainer = document.getElementById('banner-file-container');
+            const urlInput = document.getElementById('banner-url');
+            
+            if(type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                updateBannerPreview(urlInput.value);
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                updateBannerPreview(uploadedBannerImage || '');
+            }
+        }
+
+        // Handle Banner File Upload
+        function handleBannerUpload(input) {
+            if (input.files && input.files[0]) {
+                // Less compression for banners usually, but kept consistent
+                compressImage(input.files[0], 600, 0.8, (base64) => {
+                    uploadedBannerImage = base64;
+                    updateBannerPreview(uploadedBannerImage);
+                });
+            }
+        }
+
+        // Update Banner Preview
+        function updateBannerPreview(src) {
+            const img = document.getElementById('banner-preview');
+            const placeholder = document.getElementById('banner-no-img');
+            
+            if(src && src.trim() !== '') {
+                img.src = src;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('bannerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const isUrlMode = document.querySelector('input[name="banner-type"]:checked').value === 'url';
+            let finalImage = isUrlMode ? document.getElementById('banner-url').value : uploadedBannerImage;
+
+            if (!isUrlMode && !uploadedBannerImage) {
+                alert("Please upload a banner image.");
+                return;
+            }
+
+            const newBanner = {
+                image: finalImage,
+                location: document.getElementById('banner-location').value,
+                link: document.getElementById('banner-link').value
+            };
+            bannersState.push(newBanner);
+            saveBanners();
+            
+            // Reset Form
+            e.target.reset();
+            uploadedBannerImage = null;
+            updateBannerPreview('');
+            showToast('Banner added!');
+        });
+
+        function deleteBanner(index) {
+            bannersState.splice(index, 1);
+            saveBanners();
+            showToast('Banner removed.');
+        }
+
+        // ================= UTILS =================
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            
+            if (type === "error") {
+                toast.classList.remove('bg-gray-900', 'dark:bg-white', 'dark:text-gray-900');
+                toast.classList.add('bg-red-600', 'text-white');
+            } else {
+                toast.classList.remove('bg-red-600', 'text-white');
+                toast.classList.add('bg-gray-900', 'text-white', 'dark:bg-white', 'dark:text-gray-900');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
 
     </script>

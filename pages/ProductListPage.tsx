@@ -10,6 +10,7 @@ import QuickViewModal from '../components/QuickViewModal';
 const ProductListPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const { products: allProducts } = useProducts();
+  
   const category = CATEGORIES.find(c => c.id === categoryId);
   const products: Product[] = allProducts.filter(p => p.categoryId === categoryId);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);

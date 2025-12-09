@@ -48,7 +48,7 @@ const Header: React.FC = () => {
   const { getCartItemCount } = useCart();
   const { getWishlistItemCount } = useWishlist();
   const { isAuthenticated, user } = useAuth();
-  const { products } = useProducts();
+  const { products } = useProducts(); // Use dynamic products
   const cartItemCount = getCartItemCount();
   const wishlistItemCount = getWishlistItemCount();
   const [searchQuery, setSearchQuery] = useState('');

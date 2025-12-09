@@ -19,10 +19,10 @@ import QuickViewModal from '../components/QuickViewModal';
 const ProductDetailPage: React.FC = () => {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const { products } = useProducts();
   const { addToCart } = useCart();
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { getReviewsForProduct, addReview } = useReview();
+  const { products } = useProducts();
 
   const [product, setProduct] = useState<Product | undefined>(undefined);
 
@@ -35,6 +35,7 @@ const ProductDetailPage: React.FC = () => {
   const [fbtProducts, setFbtProducts] = useState<Product[]>([]);
   const [selectedFbt, setSelectedFbt] = useState<Record<number, boolean>>({});
 
+  // Derived state needs to handle product being undefined initially
   const isWishlisted = product ? isInWishlist(product.id) : false;
   const imageList = product?.images && product.images.length > 0 ? product.images : [product?.imageUrl || ''];
   const productReviews = product ? getReviewsForProduct(product.id) : [];
@@ -42,29 +43,28 @@ const ProductDetailPage: React.FC = () => {
   const thumbnailsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Only search if products have been loaded
-    if (products.length > 0) {
-      const foundProduct = products.find(p => p.id === parseInt(productId || ''));
-      setProduct(foundProduct);
+    // Re-fetch product when products list updates or productId changes
+    const foundProduct = products.find(p => p.id === parseInt(productId || ''));
+    setProduct(foundProduct);
 
-      if (foundProduct) {
-        setSelectedImage(foundProduct.imageUrl);
-        setSelectedColor(foundProduct.colors?.[0]?.name);
-        setSelectedSize(null);
-        setQuantity(1);
-        
-        // Logic for Frequently Bought Together
-        const frequentlyBought = products.filter(
-            p => p.categoryId === foundProduct.categoryId && p.id !== foundProduct.id
-        ).slice(0, 2); // Get up to 2 products
-        setFbtProducts(frequentlyBought);
-        
-        const initialSelection: Record<number, boolean> = {};
-        frequentlyBought.forEach(p => {
-            initialSelection[p.id] = true;
-        });
-        setSelectedFbt(initialSelection);
-      }
+    if (foundProduct) {
+      setSelectedImage(foundProduct.imageUrl);
+      setSelectedColor(foundProduct.colors?.[0]?.name);
+      setSelectedSize(null);
+      setQuantity(1);
+      
+      // Logic for Frequently Bought Together
+      const frequentlyBought = products.filter(
+          p => p.categoryId === foundProduct.categoryId && p.id !== foundProduct.id
+      ).slice(0, 2); // Get up to 2 products
+      setFbtProducts(frequentlyBought);
+      
+      const initialSelection: Record<number, boolean> = {};
+      frequentlyBought.forEach(p => {
+          initialSelection[p.id] = true;
+      });
+      setSelectedFbt(initialSelection);
+
     }
   }, [productId, products]);
 
@@ -160,21 +160,23 @@ const ProductDetailPage: React.FC = () => {
     });
 
     // Update the local product data state to make the summary reactive
+    // NOTE: This local update won't persist to the global context in this implementation
+    // unless we add an 'updateProduct' method to the context. 
+    // For now, it updates the visual state of the detail page.
     setProduct(prevProduct => {
-      if(!prevProduct) return undefined;
-      // Initialize rating if undefined
-      const currentRating = prevProduct.rating || { count: 0, stars: 0, breakdown: { '1':0, '2':0, '3':0, '4':0, '5':0 } };
-      const currentBreakdown = currentRating.breakdown || { '1':0, '2':0, '3':0, '4':0, '5':0 };
+      if (!prevProduct || !prevProduct.rating) return prevProduct;
       
-      const newRatingVal = reviewData.rating;
-      const ratingKey = String(Math.round(newRatingVal)) as keyof typeof currentBreakdown;
+      const newRating = reviewData.rating;
+      const ratingKey = String(Math.round(newRating)) as keyof typeof prevProduct.rating.breakdown;
+
+      const currentBreakdown = prevProduct.rating.breakdown || { '5': 0, '4': 0, '3': 0, '2': 0, '1': 0 };
 
       const newBreakdown = {
         ...currentBreakdown,
         [ratingKey]: (currentBreakdown[ratingKey] || 0) + 1,
       };
 
-      const newCount = currentRating.count + 1;
+      const newCount = prevProduct.rating.count + 1;
       
       const totalStars = Object.entries(newBreakdown).reduce(
           (sum, [star, count]) => sum + parseInt(star, 10) * (count as number), 0
@@ -185,7 +187,7 @@ const ProductDetailPage: React.FC = () => {
       return {
         ...prevProduct,
         rating: {
-          ...currentRating,
+          ...prevProduct.rating,
           count: newCount,
           stars: newStars,
           breakdown: newBreakdown,

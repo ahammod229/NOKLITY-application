@@ -1,4 +1,5 @@
 
+
 export interface Product {
   id: number;
   name: string;
@@ -24,6 +25,8 @@ export interface Product {
   };
   answeredQuestions?: number;
   reviews?: Review[];
+  freeShipping?: boolean;
+  sold?: number;
 }
 
 export interface Category {

@@ -56,25 +56,19 @@ export const REVIEWS: Review[] = [
 
 export const PRODUCTS: Product[] = [
   // Flash Sale Products
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 101, name: 'Weidasi WD-959 Mosquito Bat Rechargeable', description: 'Rechargeable mosquito bat for a bug-free environment.', price: 549, originalPrice: 800, imageUrl: 'https://i.ibb.co/gJFJHJq/mosquito-bat.png', categoryId: 'insect-killers' },
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 102, name: 'LG Plus 32 Smart TV 4K Support FHD', description: '32-inch Smart TV with 4K support and FHD resolution.', price: 14100, originalPrice: 29700, imageUrl: 'https://i.ibb.co/4T7gHqN/tv.png', categoryId: 'electronics' },
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 103, name: 'OnePlus Nord N30 SE 5G | 128GB ROM + 4GB RAM', description: 'Powerful 5G smartphone with ample storage and RAM.', price: 15949, originalPrice: 16999, imageUrl: 'https://i.ibb.co/F83S6hG/oneplus.png', categoryId: 'electronics' },
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 104, name: 'ADIDAS ULTRARUN 5 CBACK/FTWWHT', description: 'High-performance running shoes from Adidas.', price: 8998, originalPrice: 11999, imageUrl: 'https://i.ibb.co/Bq5N1Ww/adidas.png', categoryId: 'fashion' },
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 105, name: 'Mini Massage Gun Percussion Muscle...', description: 'Compact and powerful mini massage gun for muscle recovery.', price: 820, originalPrice: 1300, imageUrl: 'https://i.ibb.co/Yh4d5mD/massage-gun.png', categoryId: 'health' },
-  // FIX: Added missing 'description' property to conform to the Product type.
   { id: 106, name: 'Park Avenue Good Morning Perfume', description: 'A refreshing and long-lasting perfume for men.', price: 160, originalPrice: 425, imageUrl: 'https://i.ibb.co/pwnL1XN/perfume.png', categoryId: 'health' },
 
   // Regular Products
-  { id: 1, name: 'Smartphone Pro', description: 'The latest smartphone with a stunning display.', price: 79999, imageUrl: 'https://picsum.photos/seed/phone1/400/300', categoryId: 'electronics' },
-  { id: 2, name: 'Laptop Ultra', description: 'Powerful and lightweight for professionals.', price: 129999, imageUrl: 'https://picsum.photos/seed/laptop1/400/300', categoryId: 'electronics' },
-  { id: 3, name: 'Wireless Earbuds', description: 'Crystal clear sound, all day comfort.', price: 4999, imageUrl: 'https://i.ibb.co/3d7M7d2/headsets.png', categoryId: 'headsets' },
-  { id: 4, name: '4K Monitor', description: 'See every detail in stunning 4K.', price: 24999, imageUrl: 'https://picsum.photos/seed/monitor1/400/300', categoryId: 'electronics' },
-  { id: 5, name: 'Cordless Drill', description: 'High-torque drill for tough jobs.', price: 6999, imageUrl: 'https://picsum.photos/seed/drill1/400/300', categoryId: 'tools' },
+  { id: 1, name: 'Smartphone Pro', description: 'The latest smartphone with a stunning display.', price: 79999, imageUrl: 'https://picsum.photos/seed/phone1/400/300', categoryId: 'electronics', freeShipping: true, sold: 50 },
+  { id: 2, name: 'Laptop Ultra', description: 'Powerful and lightweight for professionals.', price: 129999, imageUrl: 'https://picsum.photos/seed/laptop1/400/300', categoryId: 'electronics', sold: 23 },
+  { id: 3, name: 'Wireless Earbuds', description: 'Crystal clear sound, all day comfort.', price: 4999, imageUrl: 'https://i.ibb.co/3d7M7d2/headsets.png', categoryId: 'headsets', freeShipping: true, sold: 888 },
+  { id: 4, name: '4K Monitor', description: 'See every detail in stunning 4K.', price: 24999, imageUrl: 'https://picsum.photos/seed/monitor1/400/300', categoryId: 'electronics', freeShipping: true, sold: 112 },
+  { id: 5, name: 'Cordless Drill', description: 'High-torque drill for tough jobs.', price: 6999, imageUrl: 'https://picsum.photos/seed/drill1/400/300', categoryId: 'tools', sold: 98 },
   { id: 6, name: 'Precision Pliers Set', description: 'A complete set of pliers for any job.', price: 1299, imageUrl: 'https://i.ibb.co/dGtCjH8/pliers.png', categoryId: 'pliers' },
   { id: 7, name: 'A4 Ring Binder', description: 'Durable and spacious ring binder.', price: 499, imageUrl: 'https://i.ibb.co/6yvY2p2/binders.png', categoryId: 'binders' },
   { id: 8, name: 'AA Rechargeable Batteries (4-pack)', description: 'Long-lasting power.', price: 899, imageUrl: 'https://i.ibb.co/j32B7zH/batteries.png', categoryId: 'batteries' },
@@ -88,8 +82,10 @@ export const PRODUCTS: Product[] = [
     id: 201,
     name: 'Bata Pacific Slip-On Sandal For Men',
     description: 'Comfortable and stylish slip-on sandal for men, perfect for casual wear. Features a durable sole and a classic deep brown color.',
-    price: 523,
-    originalPrice: 699,
+    price: 434,
+    originalPrice: 1099,
+    freeShipping: true,
+    sold: 472,
     imageUrl: 'https://i.ibb.co/pX1gX0s/sandal-main.png',
     images: [
       'https://i.ibb.co/pX1gX0s/sandal-main.png',
@@ -105,8 +101,8 @@ export const PRODUCTS: Product[] = [
     ],
     sizes: ['6', '7', '8', '9', '10'],
     rating: {
-      stars: 4.9,
-      count: 87,
+      stars: 4.0,
+      count: 113,
     },
     answeredQuestions: 25,
     reviews: REVIEWS.filter(r => r.productId === 201),

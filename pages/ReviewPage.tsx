@@ -51,7 +51,7 @@ const ReviewPage: React.FC = () => {
                 <div className="space-y-6">
                     <h2 className="text-lg font-semibold text-gray-800">Rate and review purchased product:</h2>
                     <div className="flex items-start gap-4 p-4 border rounded-md">
-                        <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain" />
+                        <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain" loading="lazy" decoding="async" />
                         <div>
                             <p className="text-sm font-medium text-gray-800">{item.name}</p>
                             <p className="text-xs text-gray-500">{item.variant}</p>

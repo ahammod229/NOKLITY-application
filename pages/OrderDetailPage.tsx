@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { mockOrders } from '../types';
@@ -33,7 +35,11 @@ const OrderDetailPage: React.FC = () => {
                                 <span className="font-bold text-lg text-gray-800 ml-4">৳ {total}</span>
                                 <button className="ml-1 text-gray-400"><Icon name="info" className="w-4 h-4"/></button>
                             </p>
-                            <p className="text-xs text-gray-500 mt-1">Provide your OTP 736669 and collect your package at Pick-up Point <span className="text-orange-500">16 Oct</span></p>
+                            {order.estimatedDelivery && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Estimated Delivery: <span className="text-orange-500 font-medium">{order.estimatedDelivery}</span>
+                                </p>
+                            )}
                         </div>
                         <Link 
                           to={`/track/${order.id}`}
@@ -45,7 +51,7 @@ const OrderDetailPage: React.FC = () => {
                 </div>
 
                 <div className="p-4 flex items-center gap-4">
-                    <img src={orderItem.imageUrl} alt={orderItem.name} className="w-20 h-20 object-contain rounded-md" />
+                    <img src={orderItem.imageUrl} alt={orderItem.name} className="w-20 h-20 object-contain rounded-md" loading="lazy" decoding="async" />
                     <div className="flex-grow">
                         <p className="text-sm text-gray-800">{orderItem.name}</p>
                         <p className="text-xs text-gray-500 mt-1">{orderItem.variant}</p>
@@ -60,6 +66,26 @@ const OrderDetailPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {order.trackingHistory && order.trackingHistory.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm p-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-6">Tracking History</h3>
+                    <div className="relative pl-8">
+                        {/* Vertical line */}
+                        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                        
+                        {order.trackingHistory.map((event, index) => (
+                            <div key={index} className="relative mb-8 last:mb-0">
+                                {/* Dot */}
+                                <div className={`absolute -left-7 top-1 w-4 h-4 rounded-full ${index === 0 ? 'bg-cyan-500 ring-4 ring-cyan-100' : 'bg-gray-300'}`}></div>
+                                <p className="text-sm text-gray-500">{event.timestamp}</p>
+                                <p className="font-semibold text-gray-800 mt-1">{event.status}</p>
+                                <p className="text-sm text-gray-600">{event.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white rounded-lg shadow-sm p-4 text-xs text-gray-500 space-y-1">
                 <p>Order <span className="text-cyan-600 font-medium">#{order.id}</span></p>

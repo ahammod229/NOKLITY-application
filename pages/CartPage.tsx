@@ -22,7 +22,7 @@ const CartPage: React.FC = () => {
               {cartItems.map(item => (
                 <div key={item.product.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <img src={item.product.imageUrl} alt={item.product.name} className="w-20 h-20 object-cover rounded-md" />
+                    <img src={item.product.imageUrl} alt={item.product.name} className="w-20 h-20 object-cover rounded-md" loading="lazy" decoding="async" />
                     <div>
                       <h2 className="font-semibold text-lg">{item.product.name}</h2>
                       <p className="text-gray-500">৳{item.product.price.toFixed(2)}</p>

@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="space-y-12">
       {/* Hero Section */}
-      <section className="relative bg-gray-100 rounded-lg overflow-hidden min-h-[450px] flex items-center">
+      <section className="relative bg-gray-100 rounded-lg overflow-hidden min-h-[250px] md:min-h-[450px] flex items-center">
         <div 
           className="absolute inset-0 bg-cover bg-left-top z-0"
           style={{ backgroundImage: "url('https://i.ibb.co/F8kQcM1/batteries-bg.jpg')" }}
@@ -41,8 +41,8 @@ const HomePage: React.FC = () => {
         <div className="relative z-10 container mx-auto px-4 grid md:grid-cols-2">
             <div className="md:col-start-2 text-center md:text-left">
                 <div className="bg-white/60 backdrop-blur-sm p-8 rounded-lg inline-block">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Genuine Electronic Parts</h1>
-                    <p className="text-lg text-gray-700 mb-8">High-quality components for your needs</p>
+                    <h1 className="text-2xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Genuine Electronic Parts</h1>
+                    <p className="text-base md:text-lg text-gray-700 mb-8">High-quality components for your needs</p>
                     <Link to="/category/electronics" className="inline-block bg-noklity-red text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-red-700 hover:shadow-lg transition-all duration-300">
                         Shop Now
                     </Link>
@@ -54,13 +54,13 @@ const HomePage: React.FC = () => {
       {/* Main Categories Section */}
       <section>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {mainCategoriesData.map((category) => (
-            <Link key={category.id} to={`/category/${category.id}`} className="block group text-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300">
+            <Link key={category.id} to={`/category/${category.id}`} className="block group text-center p-4 md:p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300">
               <div className="flex justify-center items-center mb-4 text-gray-700 group-hover:text-noklity-red transition-colors duration-300">
-                <Icon name={category.icon} className="h-12 w-12" />
+                <Icon name={category.icon} className="h-10 w-10 md:h-12 md:w-12" />
               </div>
-              <p className="font-semibold text-gray-800">{category.name}</p>
+              <p className="font-semibold text-gray-800 text-sm md:text-base">{category.name}</p>
             </Link>
           ))}
         </div>
@@ -76,13 +76,13 @@ const HomePage: React.FC = () => {
                 </div>
             </div>
             <Link to="#" className="text-sm font-semibold text-orange-600 border border-orange-500 px-4 py-2 rounded-md hover:bg-orange-50 transition-colors">
-                SHOP ALL PRODUCTS
+                SHOP ALL
             </Link>
         </div>
         <div className="border-t border-b border-gray-200 bg-white">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
             {flashSaleProducts.map((product) => (
-              <div key={product.id} className="border-r border-gray-200 last:border-r-0">
+              <div key={product.id} className="border-r border-b md:border-b-0 border-gray-200 last:border-r-0">
                   <ProductCard product={product} flashSale={true} onQuickViewClick={handleQuickView} />
               </div>
             ))}
@@ -93,7 +93,7 @@ const HomePage: React.FC = () => {
       {/* All Categories Products */}
       <section>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Explore Our Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {regularProducts.map((product) => (
             <ProductCard key={product.id} product={product} onQuickViewClick={handleQuickView} />
           ))}

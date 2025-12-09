@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,7 +11,7 @@ const FooterLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, c
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-zinc-800 text-white pt-10 pb-6">
+    <footer className="hidden md:block bg-zinc-800 text-white pt-10 pb-6">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Column 1: Links */}

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOKLITY Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'noklity-red': '#E50044',
+            },
+            keyframes: {
+                'toast-in': {
+                    '0%': { transform: 'translateY(100%)', opacity: '0' },
+                    '100%': { transform: 'translateY(0)', opacity: '1' },
+                },
+                'toast-out': {
+                    '0%': { transform: 'translateY(0)', opacity: '1' },
+                    '100%': { transform: 'translateY(100%)', opacity: '0' },
+                }
+            },
+            animation: {
+                'toast-in': 'toast-in 0.3s ease-out forwards',
+                'toast-out': 'toast-out 0.3s ease-in forwards',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .sidebar-link.active {
+            background-color: #FEF2F2; /* red-50 */
+            color: #E50044; /* noklity-red */
+            border-right: 3px solid #E50044;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg z-10 flex flex-col transition-all duration-300 hidden md:flex">
+        <div class="p-6 border-b flex items-center gap-3">
+             <!-- Using the same logo style as User Panel -->
+            <img src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-8 w-auto">
+            <span class="font-bold text-gray-700 text-sm tracking-widest uppercase">Admin</span>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <button onclick="showSection('dashboard')" id="nav-dashboard" class="sidebar-link active w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('add-product')" id="nav-add-product" class="sidebar-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Product
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('orders')" id="nav-orders" class="sidebar-link w-full flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Orders
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="p-4 border-t">
+            <button class="flex items-center text-gray-500 hover:text-noklity-red transition-colors text-sm font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Toast Container -->
+        <div id="toast-container" class="absolute bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+        <!-- Mobile Header -->
+        <header class="bg-white shadow-sm border-b p-4 md:hidden flex justify-between items-center">
+             <img src="https://i.ibb.co/p3wACj8/noklity-logo.png" alt="NOKLITY" class="h-6 w-auto">
+             <button class="text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+             </button>
+        </header>
+
+        <!-- Content Scroll Area -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 p-6 md:p-8">
+            
+            <!-- SECTION: Dashboard -->
+            <div id="section-dashboard" class="space-y-6">
+                <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Total Revenue</h3>
+                            <div class="p-2 bg-green-100 rounded-full text-green-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">৳ 124,500</p>
+                        <p class="text-green-500 text-sm mt-2 flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12 7l-5 5 1.5 1.5L12 10l5 5 1.5-1.5L12 7z" clip-rule="evenodd"></path></svg>
+                            +12% from last month
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Total Orders</h3>
+                            <div class="p-2 bg-blue-100 rounded-full text-blue-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">1,245</p>
+                        <p class="text-blue-500 text-sm mt-2">56 pending orders</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 text-sm font-medium">Products</h3>
+                            <div class="p-2 bg-orange-100 rounded-full text-orange-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-800">89</p>
+                        <p class="text-gray-500 text-sm mt-2">Active listings</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: Add Product -->
+            <div id="section-add-product" class="space-y-6 hidden">
+                <h1 class="text-2xl font-bold text-gray-800">Add New Product</h1>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl">
+                    <form id="productForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                            <input type="text" id="p-name" required
+                                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
+                                placeholder="e.g., Wireless Gaming Mouse">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Price (৳)</label>
+                                <input type="number" id="p-price" required
+                                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
+                                    placeholder="0.00">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Original Price (Optional)</label>
+                                <input type="number" id="p-original-price"
+                                    class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="p-desc" rows="4" required
+                                class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-noklity-red focus:border-noklity-red transition-shadow"
+                                placeholder="Product details..."></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                            <div class="mt-1 flex justify-center px-6 py-6 border-2 border-gray-300 border-dashed rounded-md hover:border-noklity-red transition-colors cursor-pointer bg-gray-50" id="drop-zone">
+                                <div class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex text-sm text-gray-600 justify-center">
+                                        <label for="p-image" class="relative cursor-pointer rounded-md font-medium text-noklity-red hover:text-red-700 focus-within:outline-none">
+                                            <span>Upload a file</span>
+                                            <input id="p-image" name="p-image" type="file" accept="image/*" class="sr-only" required onchange="previewImage(this)">
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                                </div>
+                            </div>
+                            <!-- Image Preview -->
+                            <div id="image-preview-container" class="mt-4 hidden">
+                                <p class="text-sm font-medium text-gray-700 mb-2">Selected Image:</p>
+                                <img id="image-preview" src="#" alt="Preview" class="h-32 w-32 object-cover rounded-md border">
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" id="btn-submit"
+                                class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-noklity-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-noklity-red transition-colors disabled:opacity-50">
+                                Create Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SECTION: Orders -->
+            <div id="section-orders" class="space-y-6 hidden">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold text-gray-800">Orders</h1>
+                    <button class="text-sm text-noklity-red font-medium hover:underline" onclick="fetchOrders()">Refresh Data</button>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="relative px-6 py-3">
+                                        <span class="sr-only">Actions</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Empty State for Orders -->
+                    <div id="orders-empty" class="hidden text-center py-10">
+                        <p class="text-gray-500">No orders found.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // ==========================================
+        // 1. SUPABASE INITIALIZATION
+        // ==========================================
+        // IMPORTANT: Replace these with your actual Supabase project URL and Anon Key
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        let supabase;
+
+        try {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } else {
+                console.warn('Supabase not configured. Please edit admin.html and add your API keys.');
+                // Dummy client to prevent crash on UI interaction if keys aren't set
+                supabase = {
+                    from: () => ({ select: () => ({ data: [], error: null }), insert: () => ({ error: null }) }),
+                    storage: { from: () => ({ upload: () => ({ data: { path: 'test' }, error: null }), getPublicUrl: () => ({ data: { publicUrl: '#' } }) }) }
+                };
+            }
+        } catch (e) {
+            console.error('Supabase Init Error:', e);
+            showToast('Failed to initialize Supabase. Check console.', 'error');
+        }
+
+        // ==========================================
+        // 2. TOAST NOTIFICATION SYSTEM
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            // Define styles based on type
+            let bgColorClass = 'bg-gray-800';
+            let iconSvg = '';
+
+            if (type === 'success') {
+                bgColorClass = 'bg-green-600';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'error') {
+                bgColorClass = 'bg-red-600';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                // Info / Warning
+                bgColorClass = 'bg-gray-800';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+
+            toast.className = `flex items-center w-full max-w-sm p-4 text-white rounded-lg shadow-lg pointer-events-auto animate-toast-in ${bgColorClass}`;
+            toast.innerHTML = `
+                <div class="flex-shrink-0">
+                    ${iconSvg}
+                </div>
+                <div class="ml-3 text-sm font-medium">
+                    ${message}
+                </div>
+                <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-white hover:text-gray-200 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-white/10 inline-flex h-8 w-8" aria-label="Close" onclick="this.parentElement.remove()">
+                    <span class="sr-only">Close</span>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto-remove after 4 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.remove('animate-toast-in');
+                    toast.classList.add('animate-toast-out');
+                    toast.addEventListener('animationend', () => {
+                        toast.remove();
+                    });
+                }
+            }, 4000);
+        }
+
+        // ==========================================
+        // 3. NAVIGATION LOGIC
+        // ==========================================
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+            
+            // Show selected section
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-link').forEach(el => el.classList.remove('active'));
+            document.getElementById(`nav-${sectionId}`).classList.add('active');
+
+            if(sectionId === 'orders') {
+                fetchOrders();
+            }
+        }
+
+        // ==========================================
+        // 4. ADD PRODUCT LOGIC
+        // ==========================================
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            const originalBtnText = btn.textContent;
+            
+            btn.textContent = 'Uploading...';
+            btn.disabled = true;
+
+            const name = document.getElementById('p-name').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const originalPrice = document.getElementById('p-original-price').value ? parseFloat(document.getElementById('p-original-price').value) : null;
+            const description = document.getElementById('p-desc').value;
+            const imageFile = document.getElementById('p-image').files[0];
+
+            try {
+                if (!imageFile) {
+                    throw new Error("Please select a product image.");
+                }
+
+                // 1. Upload Image to Supabase Storage
+                // Ensure you have a bucket named 'images' in Supabase Storage and it is Public
+                const fileName = `product_${Date.now()}_${imageFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`; // Sanitize filename
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('images') // Make sure this bucket exists
+                    .upload(fileName, imageFile);
+
+                if (uploadError) {
+                    console.error("Storage Upload Error:", uploadError);
+                    throw new Error(`Image upload failed: ${uploadError.message}. Check if 'images' bucket exists and has public policies.`);
+                }
+
+                // 2. Get Public URL
+                const { data: publicUrlData } = supabase.storage
+                    .from('images')
+                    .getPublicUrl(fileName);
+
+                const imageUrl = publicUrlData.publicUrl;
+
+                // 3. Insert into Database
+                const { error: dbError } = await supabase
+                    .from('products')
+                    .insert([
+                        { name, price, originalPrice, description, imageUrl, categoryId: 'electronics' } // Default cat for demo
+                    ]);
+
+                if (dbError) {
+                    console.error("Database Insert Error:", dbError);
+                    throw new Error(`Database insertion failed: ${dbError.message}`);
+                }
+
+                showToast('Product added successfully!', 'success');
+                document.getElementById('productForm').reset();
+                document.getElementById('image-preview-container').classList.add('hidden');
+
+            } catch (error) {
+                console.error('Error adding product:', error);
+                showToast(error.message || 'An unexpected error occurred.', 'error');
+            } finally {
+                btn.textContent = originalBtnText;
+                btn.disabled = false;
+            }
+        });
+
+        // ==========================================
+        // 5. ORDERS LOGIC
+        // ==========================================
+        async function fetchOrders() {
+            const tbody = document.getElementById('orders-table-body');
+            const emptyState = document.getElementById('orders-empty');
+            
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Loading orders...</td></tr>';
+
+            try {
+                const { data: orders, error } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error("Fetch Orders Error:", error);
+                    throw new Error(error.message);
+                }
+
+                tbody.innerHTML = ''; // Clear loading
+
+                if (!orders || orders.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+
+                orders.forEach(order => {
+                    // Safe access to properties in case database schema differs slightly
+                    const orderId = order.id || 'N/A';
+                    const customerName = order.customer_name || 'Guest';
+                    const itemCount = order.items ? order.items.length : 0;
+                    const total = order.total ? order.total.toLocaleString() : '0';
+                    const status = order.status || 'Pending';
+
+                    const row = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${orderId}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customerName}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${itemCount} Items</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">৳ ${total}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    ${status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                                      status === 'To ship' ? 'bg-orange-100 text-orange-800' : 
+                                      'bg-gray-100 text-gray-800'}">
+                                    ${status}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="text-noklity-red hover:text-red-900 font-medium transition-colors">Manage</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-500 font-medium">Failed to load orders.</td></tr>';
+                showToast(`Failed to load orders: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

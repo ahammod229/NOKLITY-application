@@ -1,5 +1,7 @@
 
-import React from 'react';
+
+
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -24,12 +26,16 @@ import TrackingPage from './pages/TrackingPage';
 import ReviewPage from './pages/ReviewPage';
 import ToastContainer from './components/Toast';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import Chatbot from './components/Chatbot';
+import MobileNav from './components/MobileNav';
 
 function App() {
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 pb-24 md:pb-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/search" element={<SearchResultsPage />} />
@@ -55,6 +61,8 @@ function App() {
       </main>
       <Footer />
       <ToastContainer />
+      <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
+      <MobileNav setIsChatbotOpen={setIsChatbotOpen} />
     </div>
   );
 }

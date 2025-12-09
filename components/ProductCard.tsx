@@ -54,26 +54,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flashSale = false, h
     e.stopPropagation();
     onQuickViewClick(product);
   };
+  
+  const discount = product.originalPrice ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
   return (
     <Link to={`/product/${product.id}`} className={cardClasses}>
-      <div className="relative aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gray-100">
+      <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
         <img
           src={product.imageUrl}
           alt={product.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-300"
         />
         <button
           onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 p-1.5 bg-white/75 rounded-full text-gray-500 hover:text-noklity-red hover:bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-noklity-red z-10"
+          className="absolute top-2 right-2 p-1.5 bg-white/75 rounded-full text-gray-500 hover:text-noklity-red hover:bg-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-noklity-red z-10 opacity-0 group-hover:opacity-100"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Icon name="heart" className={`w-5 h-5 ${isWishlisted ? 'text-noklity-red fill-current' : ''}`} />
         </button>
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
             <button
               onClick={handleQuickView}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 font-semibold rounded-full opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-gray-800 font-semibold rounded-full opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 text-sm"
               aria-label="Quick view"
             >
               <Icon name="eye" className="w-5 h-5" />
@@ -81,16 +85,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flashSale = false, h
             </button>
         </div>
       </div>
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-2 flex flex-col flex-grow text-left">
         <h3 className="text-sm text-gray-700 flex-grow mb-2 h-10 overflow-hidden">
           <HighlightedText text={product.name} highlight={highlight} />
         </h3>
-        <div>
+        {product.freeShipping && (
+            <div className="my-1">
+                <span className="bg-teal-600/10 text-teal-700 text-[10px] font-semibold px-2 py-1 rounded-sm flex items-center gap-1 w-fit">
+                    <Icon name="truck" className="w-3 h-3"/>
+                    FREE DELIVERY
+                </span>
+            </div>
+        )}
+        <div className="mt-auto">
             <p className="text-lg font-semibold text-orange-500">৳{product.price.toLocaleString()}</p>
             {product.originalPrice && (
                 <div className="flex items-center text-xs text-gray-500">
                     <span className="line-through">৳{product.originalPrice.toLocaleString()}</span>
-                    <span className="ml-2">-{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%</span>
+                    <span className="ml-2">-{discount}%</span>
+                </div>
+            )}
+            {product.rating && (
+                <div className="flex items-center text-xs text-gray-500 mt-1 gap-2">
+                    <div className="flex items-center gap-1">
+                        <Icon name="star" className="w-3 h-3 text-yellow-400"/>
+                        <span>{product.rating.stars.toFixed(1)} ({product.rating.count})</span>
+                    </div>
+                    {product.sold && (
+                        <>
+                         <span className="text-gray-300">|</span>
+                         <span>{product.sold} Sold</span>
+                        </>
+                    )}
                 </div>
             )}
         </div>

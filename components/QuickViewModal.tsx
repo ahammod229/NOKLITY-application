@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import type { Product } from '../constants';
 import { Icon } from './Icon';
@@ -40,7 +41,7 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => 
   
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    toast.show(`${quantity} x ${product.name} added to cart!`);
+    toast.success(`${quantity} x ${product.name} added to cart!`);
     onClose();
   };
 

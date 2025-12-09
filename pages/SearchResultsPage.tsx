@@ -187,7 +187,7 @@ const SearchResultsPage: React.FC = () => {
             {/* Results */}
             <main className="lg:col-span-3">
               {filteredResults.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
                   {filteredResults.map(product => (
                     <ProductCard key={product.id} product={product} highlight={query || ''} onQuickViewClick={handleQuickView} />
                   ))}

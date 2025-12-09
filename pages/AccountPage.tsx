@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { Link } from 'react-router-dom';
@@ -149,7 +150,7 @@ const AccountPage: React.FC = () => {
                                 <div key={item.id} className="border-t border-gray-200 p-4">
                                     <div className="grid grid-cols-12 gap-4 items-center">
                                         <div className="col-span-12 sm:col-span-2">
-                                            <img src={item.imageUrl} alt={item.name} className="w-20 h-20 object-cover rounded-md"/>
+                                            <img src={item.imageUrl} alt={item.name} className="w-20 h-20 object-cover rounded-md" loading="lazy" decoding="async"/>
                                         </div>
                                         <div className="col-span-12 sm:col-span-6">
                                           <Link to={`/product/${item.id}`} className="relative hover:underline">

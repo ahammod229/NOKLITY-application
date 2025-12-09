@@ -6,6 +6,7 @@ import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ReviewProvider } from './context/ReviewContext';
 import { OrderProvider } from './context/OrderContext';
+import { AuthProvider } from './context/AuthContext';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -16,15 +17,17 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <HashRouter>
-      <WishlistProvider>
-        <ReviewProvider>
-          <OrderProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </OrderProvider>
-        </ReviewProvider>
-      </WishlistProvider>
+      <AuthProvider>
+        <WishlistProvider>
+          <ReviewProvider>
+            <OrderProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </OrderProvider>
+          </ReviewProvider>
+        </WishlistProvider>
+      </AuthProvider>
     </HashRouter>
   </React.StrictMode>
 );

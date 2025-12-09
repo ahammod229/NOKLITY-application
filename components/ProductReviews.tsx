@@ -116,6 +116,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product, reviews, onWri
                       key={index} 
                       src={url} 
                       alt={`Review image ${index + 1}`} 
+                      loading="lazy"
+                      decoding="async"
                       className="w-20 h-20 object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity" />
                   ))}
                 </div>

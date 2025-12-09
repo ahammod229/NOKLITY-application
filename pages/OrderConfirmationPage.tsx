@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useLocation, Link, Navigate } from 'react-router-dom';
 import { Icon } from '../components/Icon';
@@ -32,7 +33,7 @@ const OrderConfirmationPage: React.FC = () => {
           {orderItems.map(item => (
             <div key={item.product.id} className="flex justify-between items-center text-left">
               <div className="flex items-center space-x-4">
-                <img src={item.product.imageUrl} alt={item.product.name} className="w-16 h-16 object-cover rounded-md border" />
+                <img src={item.product.imageUrl} alt={item.product.name} className="w-16 h-16 object-cover rounded-md border" loading="lazy" decoding="async" />
                 <div>
                   <p className="font-medium text-gray-800">{item.product.name}</p>
                   <p className="text-sm text-gray-500">Qty: {item.quantity}</p>

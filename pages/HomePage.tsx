@@ -36,10 +36,10 @@ const HomePage: React.FC = () => {
 
 
   const mainCategoriesData = [
-    { id: 'electronics', name: 'Electronic Products', icon: 'desktop' as const },
-    { id: 'tyres', name: 'Tyre & Tube', icon: 'tyre' as const },
-    { id: 'spare-parts', name: 'Spare Parts', icon: 'gear' as const },
-    { id: 'tools', name: 'Tools & DIY', icon: 'wrench' as const },
+    { id: 'electronics', name: 'Electronic Products', imageUrl: 'https://i.ibb.co/VvZGHgq/electronic-icon.png' },
+    { id: 'tyres', name: 'Tyre & Tube', imageUrl: 'https://i.ibb.co/1GSy7Bw/tyre-icon.png' },
+    { id: 'spare-parts', name: 'Spare Parts', imageUrl: 'https://i.ibb.co/Yy6Qz6s/bearing-icon.png' },
+    { id: 'tools', name: 'Tools & DIY', imageUrl: 'https://i.ibb.co/D8yYq3Q/tools-icon.png' },
   ];
 
   return (
@@ -77,9 +77,13 @@ const HomePage: React.FC = () => {
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {mainCategoriesData.map((category) => (
-            <Link key={category.id} to={`/category/${category.id}`} className="block group text-center p-4 md:p-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-              <div className="flex justify-center items-center mb-4 text-gray-700 dark:text-gray-300 group-hover:text-noklity-red transition-colors duration-300 transform group-hover:scale-110">
-                <Icon name={category.icon} className="h-10 w-10 md:h-12 md:w-12" />
+            <Link 
+              key={category.id} 
+              to={`/category/${category.id}`} 
+              className="block group text-center p-4 md:p-6 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-blue-200 dark:border-blue-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="flex justify-center items-center mb-4 h-16 md:h-20">
+                <img src={category.imageUrl} alt={category.name} className="h-full w-auto object-contain transition-transform duration-300 group-hover:scale-110" />
               </div>
               <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm md:text-base">{category.name}</p>
             </Link>

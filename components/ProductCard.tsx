@@ -59,6 +59,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, flashSale = false, h
   return (
     <Link to={`/product/${product.id}`} className={cardClasses}>
       <div className="relative aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+        {discount > 0 && (
+          <div className="absolute top-2 left-2 bg-noklity-red text-white text-[10px] font-bold px-2 py-1 rounded-md z-10">
+            -{discount}%
+          </div>
+        )}
         <img
           src={product.imageUrl}
           alt={product.name}

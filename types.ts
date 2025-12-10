@@ -1,3 +1,4 @@
+
 import type { Product, Category, Review } from './constants';
 
 export const CATEGORIES: Category[] = [
@@ -163,7 +164,7 @@ export type TrackingEvent = {
 export type Order = {
   id: string;
   sellerName: string;
-  status: 'Shipped' | 'Completed' | 'Cancelled' | 'To Pay' | 'To ship' | 'To Receive' | 'To Review';
+  status: 'Shipped' | 'Completed' | 'Cancelled' | 'To Pay' | 'To ship' | 'To Receive' | 'To Review' | 'Delivered';
   items: OrderItem[];
   estimatedDelivery?: string;
   deliveryPartner?: string;

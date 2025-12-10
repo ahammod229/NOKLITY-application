@@ -1,15 +1,21 @@
+
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { mockOrders } from '../types';
 import { Icon, IconName } from '../components/Icon';
 import StarRating from '../components/StarRating';
 import ToggleSwitch from '../components/ToggleSwitch';
+import { useReview } from '../context/ReviewContext';
+import { toast } from '../components/Toast';
+import { useAuth } from '../context/AuthContext';
 
 type SellerRating = 'Negative' | 'Neutral' | 'Positive' | null;
 
 const ReviewPage: React.FC = () => {
     const { orderId, itemId } = useParams<{ orderId: string, itemId: string }>();
     const navigate = useNavigate();
+    const { addReview } = useReview();
+    const { user } = useAuth();
     
     const order = mockOrders.find(o => o.id === orderId);
     const item = order?.items.find(i => i.id === Number(itemId));
@@ -17,6 +23,7 @@ const ReviewPage: React.FC = () => {
     const [productRating, setProductRating] = useState(5);
     const [sellerRating, setSellerRating] = useState<SellerRating>('Positive');
     const [deliveryRating, setDeliveryRating] = useState(0);
+    const [comment, setComment] = useState('');
     const [isAnonymous, setIsAnonymous] = useState(false);
 
     if (!order || !item) {
@@ -36,14 +43,32 @@ const ReviewPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Review submitted! (This is a demo)');
-        navigate('/account');
+        
+        if (!comment.trim()) {
+            toast.error('Please write a review comment.');
+            return;
+        }
+
+        addReview(Number(itemId), {
+            rating: productRating,
+            comment: comment,
+            author: isAnonymous ? 'Anonymous' : (user?.name || 'Verified User'),
+            date: new Date().toISOString(),
+            verifiedPurchase: true,
+            sellerRating: sellerRating || undefined,
+            isAnonymous: isAnonymous,
+            variantInfo: item.variant
+        });
+
+        toast.success('Review submitted successfully!');
+        // Redirect to product page to see the review
+        navigate(`/product/${itemId}`);
     }
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm">
             <header className="border-b pb-4 mb-6">
-                <p className="text-lg text-gray-700">Delivered on 26 Sep 2025</p>
+                <p className="text-lg text-gray-700">Delivered</p>
             </header>
 
             <div className="grid lg:grid-cols-2 gap-8">
@@ -70,8 +95,11 @@ const ReviewPage: React.FC = () => {
                         </label>
                         <textarea 
                             rows={4} 
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
                             placeholder="What do you think of this product?"
                             className="mt-2 w-full p-3 border rounded-md focus:ring-cyan-500 focus:border-cyan-500"
+                            required
                         ></textarea>
                     </div>
 
@@ -129,7 +157,7 @@ const ReviewPage: React.FC = () => {
                     </div>
                     
                     <div className="border-t pt-6 flex items-center justify-between">
-                         <span className="text-sm text-gray-700">Review as Ahammod A.</span>
+                         <span className="text-sm text-gray-700">Review as {user?.name || 'Verified User'}</span>
                          <div className="flex items-center gap-2">
                             <ToggleSwitch checked={isAnonymous} onChange={setIsAnonymous} />
                             <span className={`text-sm font-semibold ${isAnonymous ? 'text-cyan-600' : 'text-gray-500'}`}>Anonymous</span>

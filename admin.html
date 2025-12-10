@@ -452,7 +452,7 @@
         </div>
 
         <!-- ADD PRODUCT MODAL -->
-        <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div id="productModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transition-colors">
                 <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
@@ -581,6 +581,25 @@
             </div>
         </div>
 
+        <!-- DELETE CONFIRMATION MODAL -->
+        <div id="deleteConfirmModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-sm transition-colors">
+                <div class="p-6 text-center">
+                    <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Are you sure?</h3>
+                    <p id="deleteConfirmMessage" class="text-gray-500 dark:text-gray-400 mb-6">Do you really want to delete this item? This process cannot be undone.</p>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="toggleDeleteConfirmModal(false)" class="px-6 py-2 text-gray-700 dark:text-gray-300 font-medium bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="executeDelete()" class="px-6 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Toast Notification -->
         <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
             <span id="toast-msg">Notification</span>
@@ -663,8 +682,8 @@
 
         // ================= STATE & SYNC =================
         const initialProducts = [
-            { id: 101, name: 'Weidasi WD-959 Mosquito Bat', category: 'electronics', price: 549, image: 'https://i.ibb.co/gJFJHJq/mosquito-bat.png' },
-            { id: 102, name: 'LG Plus 32 Smart TV', category: 'electronics', price: 14100, image: 'https://i.ibb.co/4T7gHqN/tv.png' }
+            { id: 101, name: 'Weidasi WD-959 Mosquito Bat', category: 'electronics', price: 549, imageUrl: 'https://i.ibb.co/gJFJHJq/mosquito-bat.png' },
+            { id: 102, name: 'LG Plus 32 Smart TV', category: 'electronics', price: 14100, imageUrl: 'https://i.ibb.co/4T7gHqN/tv.png' }
         ];
         const initialUsers = [
             { id: 1, name: 'Ahammod Ali', email: 'ahammod@example.com', role: 'Super Admin', status: 'active', date: '2023-10-01' },
@@ -673,6 +692,40 @@
 
         let productsState = [], usersState = [], bannersState = [], ordersState = [];
         let uploadedProductImage = null, uploadedLogoImage = null, uploadedBannerImage = null;
+
+        let itemToDelete = null;
+
+        function toggleDeleteConfirmModal(show, id = null, type = null, name = null) {
+            const modal = document.getElementById('deleteConfirmModal');
+            if (show) {
+                itemToDelete = { id, type };
+                const messageEl = document.getElementById('deleteConfirmMessage');
+                if (name) {
+                    messageEl.innerHTML = `Do you really want to delete "<strong>${name}</strong>"? This process cannot be undone.`;
+                } else {
+                    messageEl.innerText = 'Do you really want to delete this item? This process cannot be undone.';
+                }
+                modal.classList.remove('hidden');
+            } else {
+                itemToDelete = null;
+                modal.classList.add('hidden');
+            }
+        }
+
+        function executeDelete() {
+            if (!itemToDelete) return;
+
+            if (itemToDelete.type === 'product') {
+                productsState = productsState.filter(p => p.id !== itemToDelete.id);
+                saveProducts();
+                showToast('Product deleted successfully.');
+            } else if (itemToDelete.type === 'user') {
+                usersState = usersState.filter(u => u.id !== itemToDelete.id);
+                saveUsers();
+                showToast('User deleted successfully.');
+            }
+            toggleDeleteConfirmModal(false);
+        }
 
         function loadInitialData() {
             productsState = JSON.parse(localStorage.getItem('admin_products') || JSON.stringify(initialProducts));
@@ -717,47 +770,39 @@
         const saveOrders = () => saveState('admin_orders', ordersState);
         const saveBanners = () => saveState('admin_banners', bannersState);
 
-        function compressImage(file, maxWidth, quality, callback) { /* ... implementation ... */ }
-        function renderProducts() { /* ... implementation ... */ }
-        function toggleProductModal(show) { /* ... implementation ... */ }
-        function toggleImageInput(type) { /* ... implementation ... */ }
-        function handleFileUpload(input) { /* ... implementation ... */ }
-        function updateImagePreview(src) { /* ... implementation ... */ }
-        function clearImage() { /* ... implementation ... */ }
-        function deleteProduct(id) { /* ... implementation ... */ }
-        function renderOrders() { /* ... implementation ... */ }
-        function updateOrderStatus(id, newStatus) { /* ... implementation ... */ }
-        function renderDashboardPreview() { /* ... implementation ... */ }
+        function compressImage(file, maxWidth, quality, callback) { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = event => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let width = img.width, height = img.height; if (width > maxWidth) { height = Math.round((height *= maxWidth / width)); width = maxWidth; } canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', quality)); }; }; };
+        
+        function renderProducts() { 
+            const tbody = document.getElementById('product-list-body'); 
+            if(!tbody) return; 
+            tbody.innerHTML = ''; 
+            productsState.forEach(p => { 
+                const tr = document.createElement('tr'); 
+                tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'; 
+                tr.innerHTML = `<td class="px-6 py-4 flex items-center"><img src="${p.imageUrl || p.image}" class="w-10 h-10 rounded object-contain border dark:border-gray-600 bg-white"><span class="ml-3 font-medium text-gray-900 dark:text-white truncate max-w-xs">${p.name}</span></td><td class="px-6 py-4 text-gray-600 dark:text-gray-300 capitalize">${p.categoryId || p.category}</td><td class="px-6 py-4 font-medium text-gray-900 dark:text-white">৳ ${p.price}</td><td class="px-6 py-4 text-center"><button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 text-sm">Delete</button></td>`; 
+                tbody.appendChild(tr); 
+            }); 
+        };
+        
+        function toggleProductModal(show) { const modal = document.getElementById('productModal'); if (show) modal.classList.remove('hidden'); else { modal.classList.add('hidden'); clearImage(); } };
+        function toggleImageInput(type) { const urlC = document.getElementById('input-url-container'), fileC = document.getElementById('input-file-container'), urlI = document.getElementById('p-image-url'); if(type === 'url') { urlC.classList.remove('hidden'); fileC.classList.add('hidden'); urlI.required = true; updateImagePreview(urlI.value); } else { urlC.classList.add('hidden'); fileC.classList.remove('hidden'); urlI.required = false; updateImagePreview(uploadedProductImage || ''); } };
+        function handleFileUpload(input) { if (input.files && input.files[0]) { compressImage(input.files[0], 400, 0.7, (b64) => { uploadedProductImage = b64; updateImagePreview(uploadedProductImage); }); } };
+        function updateImagePreview(src) { const img = document.getElementById('image-preview'), p = document.getElementById('no-image-text'), c = document.getElementById('clear-image-btn'); if (!img || !p || !c) return; if(src && src.trim()) { img.src = src; img.classList.remove('hidden'); p.classList.add('hidden'); c.classList.remove('hidden'); } else { img.src = ''; img.classList.add('hidden'); p.classList.remove('hidden'); c.classList.add('hidden'); } };
+        function clearImage() { document.getElementById('p-image-url').value = ''; document.getElementById('p-image-file').value = ''; uploadedProductImage = null; updateImagePreview(''); };
+        
+        function deleteProduct(id) { 
+            const product = productsState.find(p => p.id === id);
+            toggleDeleteConfirmModal(true, id, 'product', product ? product.name : 'this product');
+        };
+
+        function renderOrders() { const tbody = document.getElementById('orders-list-body'); if(!tbody) return; tbody.innerHTML = ''; if (ordersState.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found.</td></tr>'; return; } ordersState.forEach(order => { const total = order.items.reduce((s, i) => s + (i.price * i.quantity), 0); const tr = document.createElement('tr'); tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'; let sC = 'bg-gray-100 dark:bg-gray-600'; if(['Completed', 'Delivered'].includes(order.status)) sC = 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'; tr.innerHTML = `<td class="px-6 py-4 font-medium">#${order.id}</td><td class="px-6 py-4 text-xs">${order.items.map(i => `<div class="truncate max-w-[200px]">${i.quantity}x ${i.name}</div>`).join('')}</td><td class="px-6 py-4 font-medium">৳ ${total.toLocaleString()}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${sC}">${order.status}</span></td><td class="px-6 py-4 text-center"><select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs border rounded p-1 bg-white dark:bg-gray-700 dark:border-gray-600"><option value="To ship" ${order.status === 'To ship' ? 'selected' : ''}>To ship</option><option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option><option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option><option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option><option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option></select></td>`; tbody.appendChild(tr); }); };
+        function updateOrderStatus(id, status) { const i = ordersState.findIndex(o => o.id === id); if(i !== -1) { ordersState[i].status = status; saveOrders(); showToast(`Order #${id} updated.`); } };
+        function renderDashboardPreview() { const tbody = document.getElementById('dashboard-orders-preview'); if(!tbody) return; tbody.innerHTML = ''; const rO = ordersState.slice(0, 5); if (rO.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No recent orders.</td></tr>'; return; } rO.forEach(o => { const t = o.items.reduce((s, i) => s + (i.price * i.quantity), 0); const tr = document.createElement('tr'); tr.className = 'border-b border-gray-50 dark:border-gray-700'; tr.innerHTML = `<td class="px-6 py-4 font-medium">#${o.id}</td><td class="px-6 py-4">Customer</td><td class="px-6 py-4">৳ ${t.toLocaleString()}</td><td><span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full">${o.status}</span></td>`; tbody.appendChild(tr); }); };
         function toggleLogoInput(type) { /* ... implementation ... */ }
         function handleLogoUpload(input) { /* ... implementation ... */ }
         function updateLogoPreview(src) { /* ... implementation ... */ }
         
-        function toggleUserModal(show, userToEdit) { /* ... implementation ... */ }
-        function editUser(id) { /* ... implementation ... */ }
-        function toggleUserStatus(id) { /* ... implementation ... */ }
-        function deleteUser(id) { /* ... implementation ... */ }
-        function updateStats() { /* ... implementation ... */ }
-        function renderBanners() { /* ... implementation ... */ }
-        function toggleBannerInput(type) { /* ... implementation ... */ }
-        function handleBannerUpload(input) { /* ... implementation ... */ }
-        function updateBannerPreview(src) { /* ... implementation ... */ }
-        function deleteBanner(index) { /* ... implementation ... */ }
-        function showToast(msg, type) { /* ... implementation ... */ }
-
-        // Re-implementations
-        compressImage = function(file, maxWidth, quality, callback) { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = event => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let width = img.width, height = img.height; if (width > maxWidth) { height = Math.round((height *= maxWidth / width)); width = maxWidth; } canvas.width = width; canvas.height = height; canvas.getContext('2d').drawImage(img, 0, 0, width, height); callback(canvas.toDataURL('image/jpeg', quality)); }; }; };
-        renderProducts = function() { const tbody = document.getElementById('product-list-body'); if(!tbody) return; tbody.innerHTML = ''; productsState.forEach(p => { const tr = document.createElement('tr'); tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'; tr.innerHTML = `<td class="px-6 py-4 flex items-center"><img src="${p.imageUrl || p.image}" class="w-10 h-10 rounded object-contain border dark:border-gray-600 bg-white"><span class="ml-3 font-medium text-gray-900 dark:text-white truncate max-w-xs">${p.name}</span></td><td class="px-6 py-4 text-gray-600 dark:text-gray-300 capitalize">${p.categoryId || p.category}</td><td class="px-6 py-4 font-medium text-gray-900 dark:text-white">৳ ${p.price}</td><td class="px-6 py-4 text-center"><button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 text-sm">Delete</button></td>`; tbody.appendChild(tr); }); };
-        toggleProductModal = function(show) { const modal = document.getElementById('productModal'); if (show) modal.classList.remove('hidden'); else { modal.classList.add('hidden'); clearImage(); } };
-        toggleImageInput = function(type) { const urlC = document.getElementById('input-url-container'), fileC = document.getElementById('input-file-container'), urlI = document.getElementById('p-image-url'); if(type === 'url') { urlC.classList.remove('hidden'); fileC.classList.add('hidden'); urlI.required = true; updateImagePreview(urlI.value); } else { urlC.classList.add('hidden'); fileC.classList.remove('hidden'); urlI.required = false; updateImagePreview(uploadedProductImage || ''); } };
-        handleFileUpload = function(input) { if (input.files && input.files[0]) { compressImage(input.files[0], 400, 0.7, (b64) => { uploadedProductImage = b64; updateImagePreview(uploadedProductImage); }); } };
-        updateImagePreview = function(src) { const img = document.getElementById('image-preview'), p = document.getElementById('no-image-text'), c = document.getElementById('clear-image-btn'); if (!img || !p || !c) return; if(src && src.trim()) { img.src = src; img.classList.remove('hidden'); p.classList.add('hidden'); c.classList.remove('hidden'); } else { img.src = ''; img.classList.add('hidden'); p.classList.remove('hidden'); c.classList.add('hidden'); } };
-        clearImage = function() { document.getElementById('p-image-url').value = ''; document.getElementById('p-image-file').value = ''; uploadedProductImage = null; updateImagePreview(''); };
-        deleteProduct = function(id) { if(confirm('Are you sure?')) { productsState = productsState.filter(p => p.id !== id); saveProducts(); showToast('Product deleted.'); } };
-        renderOrders = function() { const tbody = document.getElementById('orders-list-body'); if(!tbody) return; tbody.innerHTML = ''; if (ordersState.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No orders found.</td></tr>'; return; } ordersState.forEach(order => { const total = order.items.reduce((s, i) => s + (i.price * i.quantity), 0); const tr = document.createElement('tr'); tr.className = 'border-b border-gray-50 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50'; let sC = 'bg-gray-100 dark:bg-gray-600'; if(['Completed', 'Delivered'].includes(order.status)) sC = 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'; tr.innerHTML = `<td class="px-6 py-4 font-medium">#${order.id}</td><td class="px-6 py-4 text-xs">${order.items.map(i => `<div class="truncate max-w-[200px]">${i.quantity}x ${i.name}</div>`).join('')}</td><td class="px-6 py-4 font-medium">৳ ${total.toLocaleString()}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-semibold ${sC}">${order.status}</span></td><td class="px-6 py-4 text-center"><select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs border rounded p-1 bg-white dark:bg-gray-700 dark:border-gray-600"><option value="To ship" ${order.status === 'To ship' ? 'selected' : ''}>To ship</option><option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option><option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option><option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option><option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option></select></td>`; tbody.appendChild(tr); }); };
-        updateOrderStatus = function(id, status) { const i = ordersState.findIndex(o => o.id === id); if(i !== -1) { ordersState[i].status = status; saveOrders(); showToast(`Order #${id} updated.`); } };
-        renderDashboardPreview = function() { const tbody = document.getElementById('dashboard-orders-preview'); if(!tbody) return; tbody.innerHTML = ''; const rO = ordersState.slice(0, 5); if (rO.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No recent orders.</td></tr>'; return; } rO.forEach(o => { const t = o.items.reduce((s, i) => s + (i.price * i.quantity), 0); const tr = document.createElement('tr'); tr.className = 'border-b border-gray-50 dark:border-gray-700'; tr.innerHTML = `<td class="px-6 py-4 font-medium">#${o.id}</td><td class="px-6 py-4">Customer</td><td class="px-6 py-4">৳ ${t.toLocaleString()}</td><td><span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs rounded-full">${o.status}</span></td>`; tbody.appendChild(tr); }); };
-        
-        renderUsers = function() {
+        function renderUsers() {
             const tbody = document.getElementById('user-list-body');
             if (!tbody) return;
             tbody.innerHTML = '';
@@ -791,13 +836,22 @@
             });
         };
 
-        toggleUserModal = function(show, user) { const m = document.getElementById('userModal'), t = document.getElementById('userModalTitle'), b = document.getElementById('userModalBtn'), f = document.getElementById('addUserForm'); if(show) { m.classList.remove('hidden'); if(user) { t.innerText = "Edit User"; b.innerText = "Update"; document.getElementById('u-id').value = user.id; document.getElementById('u-name').value = user.name; document.getElementById('u-email').value = user.email; document.getElementById('u-role').value = user.role; } else { t.innerText = "Add User"; b.innerText = "Create"; f.reset(); document.getElementById('u-id').value = ""; } } else { m.classList.add('hidden'); f.reset(); } };
-        editUser = function(id) { const u = usersState.find(u => u.id === id); if(u) toggleUserModal(true, u); };
-        toggleUserStatus = function(id) { const i = usersState.findIndex(u => u.id === id); if(i !== -1) { usersState[i].status = usersState[i].status === 'active' ? 'blocked' : 'active'; saveUsers(); showToast(`User status updated.`); } };
-        deleteUser = function(id) { if(confirm('Delete user?')) { usersState = usersState.filter(u => u.id !== id); saveUsers(); showToast('User deleted.'); } };
-        updateStats = function() { document.getElementById('total-products-count').innerText = productsState.length; document.getElementById('total-users-count').innerText = usersState.length; document.getElementById('stat-new-orders').innerText = ordersState.length; const tS = ordersState.filter(o => ['Completed', 'Delivered', 'Shipped', 'To ship'].includes(o.status)).reduce((a, o) => a + o.items.reduce((s, i) => s + (i.price * i.quantity), 0), 0); document.getElementById('stat-total-sales').innerText = `৳ ${tS.toLocaleString()}`; };
+        function toggleUserModal(show, user) { const m = document.getElementById('userModal'), t = document.getElementById('userModalTitle'), b = document.getElementById('userModalBtn'), f = document.getElementById('addUserForm'); if(show) { m.classList.remove('hidden'); if(user) { t.innerText = "Edit User"; b.innerText = "Update"; document.getElementById('u-id').value = user.id; document.getElementById('u-name').value = user.name; document.getElementById('u-email').value = user.email; document.getElementById('u-role').value = user.role; } else { t.innerText = "Add User"; b.innerText = "Create"; f.reset(); document.getElementById('u-id').value = ""; } } else { m.classList.add('hidden'); f.reset(); } };
+        function editUser(id) { const u = usersState.find(u => u.id === id); if(u) toggleUserModal(true, u); };
+        function toggleUserStatus(id) { const i = usersState.findIndex(u => u.id === id); if(i !== -1) { usersState[i].status = usersState[i].status === 'active' ? 'blocked' : 'active'; saveUsers(); showToast(`User status updated.`); } };
+        function deleteUser(id) { 
+            const user = usersState.find(u => u.id === id);
+            toggleDeleteConfirmModal(true, id, 'user', user ? user.name : 'this user');
+        };
+
+        function updateStats() { document.getElementById('total-products-count').innerText = productsState.length; document.getElementById('total-users-count').innerText = usersState.length; document.getElementById('stat-new-orders').innerText = ordersState.length; const tS = ordersState.filter(o => ['Completed', 'Delivered', 'Shipped', 'To ship'].includes(o.status)).reduce((a, o) => a + o.items.reduce((s, i) => s + (i.price * i.quantity), 0), 0); document.getElementById('stat-total-sales').innerText = `৳ ${tS.toLocaleString()}`; };
+        function renderBanners() { /* ... implementation ... */ }
+        function toggleBannerInput(type) { /* ... implementation ... */ }
+        function handleBannerUpload(input) { /* ... implementation ... */ }
+        function updateBannerPreview(src) { /* ... implementation ... */ }
+        function deleteBanner(index) { /* ... implementation ... */ }
         
-        showToast = function(msg, type = "success") { const t = document.getElementById('toast'); t.querySelector('span').innerText = msg; t.className = `fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-xl z-50 flex items-center transition-all duration-300 ${type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'}`; t.classList.remove('translate-y-20', 'opacity-0'); setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000); };
+        function showToast(msg, type = "success") { const t = document.getElementById('toast'); t.querySelector('span').innerText = msg; t.className = `fixed bottom-5 right-5 px-6 py-3 rounded-lg shadow-xl z-50 flex items-center transition-all duration-300 ${type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'}`; t.classList.remove('translate-y-20', 'opacity-0'); setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000); };
 
         document.getElementById('addProductForm').addEventListener('submit', (e) => { e.preventDefault(); const i = document.querySelector('input[name="image-type"]:checked').value === 'url' ? document.getElementById('p-image-url').value : uploadedProductImage; if (!i || !i.trim()) { alert("Please provide an image."); return; } productsState.push({ id: Date.now(), name: document.getElementById('p-name').value, price: parseFloat(document.getElementById('p-price').value), originalPrice: parseFloat(document.getElementById('p-original').value) || null, categoryId: document.getElementById('p-category').value, imageUrl: i, brand: document.getElementById('p-brand').value, description: document.getElementById('p-desc').value }); saveProducts(); toggleProductModal(false); e.target.reset(); clearImage(); showToast('Product added!'); });
         document.getElementById('addUserForm').addEventListener('submit', (e) => { e.preventDefault(); const id = document.getElementById('u-id').value, name = document.getElementById('u-name').value, email = document.getElementById('u-email').value, role = document.getElementById('u-role').value; if (id) { const i = usersState.findIndex(u => u.id == id); if (i !== -1) { usersState[i] = { ...usersState[i], name, email, role }; showToast('User updated!'); } } else { usersState.push({ id: Date.now(), name, email, role, status: 'active', date: new Date().toISOString().split('T')[0] }); showToast('User added!'); } saveUsers(); toggleUserModal(false); });

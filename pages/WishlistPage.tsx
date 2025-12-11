@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '../context/WishlistContext';
@@ -21,12 +22,12 @@ const WishlistPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg min-h-[60vh]">
-      <h1 className="text-3xl font-bold mb-6 border-b pb-4">My Wishlist</h1>
+    <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg min-h-[60vh] transition-colors duration-200">
+      <h1 className="text-3xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700 pb-4 text-gray-900 dark:text-white">My Wishlist</h1>
       {wishlistedProducts.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-gray-600 text-lg">Your wishlist is empty.</p>
-          <p className="text-gray-500 mt-2">Add items you love to your wishlist to save them for later.</p>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">Your wishlist is empty.</p>
+          <p className="text-gray-500 dark:text-gray-500 mt-2">Add items you love to your wishlist to save them for later.</p>
           <Link to="/" className="mt-6 inline-block bg-noklity-red text-white font-semibold py-2 px-6 rounded-lg hover:bg-red-700 transition-colors">
             Discover Products
           </Link>

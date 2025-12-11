@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import type { Review } from '../constants';
 import { REVIEWS as initialReviews } from '../types';
 
@@ -24,7 +23,21 @@ interface ReviewContextType {
 const ReviewContext = createContext<ReviewContextType | undefined>(undefined);
 
 export const ReviewProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  // Initialize from localStorage or fallback to mock data
+  const [reviews, setReviews] = useState<Review[]>(() => {
+    try {
+      const savedReviews = localStorage.getItem('site_reviews');
+      return savedReviews ? JSON.parse(savedReviews) : initialReviews;
+    } catch (error) {
+      console.error("Error parsing reviews from local storage", error);
+      return initialReviews;
+    }
+  });
+
+  // Save to localStorage whenever reviews change
+  useEffect(() => {
+    localStorage.setItem('site_reviews', JSON.stringify(reviews));
+  }, [reviews]);
 
   const getReviewsForProduct = (productId: number) => {
     return reviews.filter(review => review.productId === productId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

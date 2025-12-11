@@ -14,12 +14,12 @@ const RATINGS = [4, 3, 2, 1];
 const FilterSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="border-b py-4">
-      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center text-left font-semibold text-gray-800 hover:text-noklity-red">
+    <div className="border-b border-gray-200 dark:border-gray-700 py-4">
+      <button onClick={() => setIsOpen(!isOpen)} className="w-full flex justify-between items-center text-left font-semibold text-gray-800 dark:text-white hover:text-noklity-red dark:hover:text-noklity-red">
         <span>{title}</span>
-        <Icon name={isOpen ? 'chevronUp' : 'chevronDown'} className="w-5 h-5" />
+        <Icon name={isOpen ? 'chevronUp' : 'chevronDown'} className="w-5 h-5 text-gray-500 dark:text-gray-400" />
       </button>
-      {isOpen && <div className="mt-4 space-y-2 text-sm">{children}</div>}
+      {isOpen && <div className="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-300">{children}</div>}
     </div>
   );
 };
@@ -128,32 +128,32 @@ const SearchResultsPage: React.FC = () => {
       <nav className="text-sm mb-4" aria-label="Breadcrumb">
         <ol className="list-none p-0 inline-flex">
           <li className="flex items-center">
-            <Link to="/" className="text-gray-500 hover:text-gray-700">Home</Link>
-            <Icon name="chevronRight" className="h-4 w-4 mx-2 text-gray-400" />
+            <Link to="/" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">Home</Link>
+            <Icon name="chevronRight" className="h-4 w-4 mx-2 text-gray-400 dark:text-gray-500" />
           </li>
           <li>
-            <span className="text-gray-700 font-medium">Search</span>
+            <span className="text-gray-700 dark:text-gray-300 font-medium">Search</span>
           </li>
         </ol>
       </nav>
 
       {query ? (
         <>
-          <h1 className="text-3xl font-bold mb-6 border-b pb-4">
+          <h1 className="text-3xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700 pb-4 text-gray-900 dark:text-white">
             Search Results for: <span className="text-noklity-red">"{query}"</span>
           </h1>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Filters Sidebar */}
-            <aside className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm h-fit">
+            <aside className="lg:col-span-1 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm h-fit border border-gray-100 dark:border-gray-700 transition-colors">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Filters</h2>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Filters</h2>
                 <button onClick={clearFilters} className="text-sm text-noklity-red hover:underline">Clear All</button>
               </div>
               
               <FilterSection title="Category">
                 {CATEGORIES.map(category => (
                   <label key={category.id} className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-noklity-red focus:ring-noklity-red"
+                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-noklity-red focus:ring-noklity-red bg-white dark:bg-gray-700"
                       checked={filters.categories.includes(category.id)}
                       onChange={() => handleCheckboxChange('categories', category.id)} />
                     <span>{category.name}</span>
@@ -163,16 +163,16 @@ const SearchResultsPage: React.FC = () => {
 
               <FilterSection title="Price Range">
                 <div className="flex items-center space-x-2">
-                  <input type="text" placeholder="Min" value={filters.minPrice} onChange={e => handlePriceChange(e, 'min')} className="w-full p-2 border rounded-md text-sm" />
-                  <span>-</span>
-                  <input type="text" placeholder="Max" value={filters.maxPrice} onChange={e => handlePriceChange(e, 'max')} className="w-full p-2 border rounded-md text-sm" />
+                  <input type="text" placeholder="Min" value={filters.minPrice} onChange={e => handlePriceChange(e, 'min')} className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
+                  <span className="text-gray-500 dark:text-gray-400">-</span>
+                  <input type="text" placeholder="Max" value={filters.maxPrice} onChange={e => handlePriceChange(e, 'max')} className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white" />
                 </div>
               </FilterSection>
 
               <FilterSection title="Brand">
                 {brands.map(brand => (
                    <label key={brand} className="flex items-center space-x-2 cursor-pointer">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-noklity-red focus:ring-noklity-red"
+                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-noklity-red focus:ring-noklity-red bg-white dark:bg-gray-700"
                       checked={filters.brands.includes(brand)}
                       onChange={() => handleCheckboxChange('brands', brand)} />
                     <span>{brand}</span>
@@ -183,9 +183,9 @@ const SearchResultsPage: React.FC = () => {
               <FilterSection title="Rating">
                   {RATINGS.map(star => (
                       <button key={star} onClick={() => handleRatingChange(star)}
-                          className={`flex items-center p-2 rounded-md w-full text-left ${filters.rating === star ? 'bg-yellow-100' : 'hover:bg-gray-100'}`}>
+                          className={`flex items-center p-2 rounded-md w-full text-left transition-colors ${filters.rating === star ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
                           <StarRating rating={star} />
-                          <span className="ml-2 text-gray-600">& up</span>
+                          <span className="ml-2 text-gray-600 dark:text-gray-300">& up</span>
                       </button>
                   ))}
               </FilterSection>
@@ -200,9 +200,9 @@ const SearchResultsPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 bg-white rounded-lg shadow-sm">
-                  <h2 className="text-2xl font-bold">No products found</h2>
-                  <p className="text-gray-600 mt-2">Try adjusting your filters or search for something else.</p>
+                <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">No products found</h2>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">Try adjusting your filters or search for something else.</p>
                 </div>
               )}
             </main>
@@ -211,8 +211,8 @@ const SearchResultsPage: React.FC = () => {
         </>
       ) : (
          <div className="text-center py-10">
-            <h2 className="text-2xl font-bold">Please enter a search term</h2>
-            <p className="text-gray-600 mt-2">Use the search bar in the header to find products.</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Please enter a search term</h2>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">Use the search bar in the header to find products.</p>
          </div>
       )}
     </div>

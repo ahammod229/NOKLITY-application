@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { useLocation, Link, Navigate } from 'react-router-dom';
 import { Icon } from '../components/Icon';
@@ -20,30 +19,30 @@ const OrderConfirmationPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center text-center py-12">
-      <div className="bg-green-100 rounded-full p-4 mb-6">
-        <Icon name="check-circle" className="w-12 h-12 text-green-500" />
+      <div className="bg-green-100 dark:bg-green-900/30 rounded-full p-4 mb-6">
+        <Icon name="check-circle" className="w-12 h-12 text-green-500 dark:text-green-400" />
       </div>
-      <h1 className="text-4xl font-bold text-gray-800 mb-3">Thank you for your purchase</h1>
-      <p className="text-gray-600 mb-1">We've received your order will ship in 5-7 business days.</p>
-      <p className="text-gray-600 mb-8">Your order number is <span className="font-semibold text-gray-800">#{orderNumber}</span></p>
+      <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-3">Thank you for your purchase</h1>
+      <p className="text-gray-600 dark:text-gray-300 mb-1">We've received your order will ship in 5-7 business days.</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-8">Your order number is <span className="font-semibold text-gray-800 dark:text-white">#{orderNumber}</span></p>
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow-md w-full max-w-lg p-6 mb-8">
-        <h2 className="text-xl font-semibold text-left mb-4">Order Summary</h2>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md w-full max-w-lg p-6 mb-8 transition-colors duration-200">
+        <h2 className="text-xl font-semibold text-left mb-4 text-gray-800 dark:text-white">Order Summary</h2>
         <div className="space-y-4">
           {orderItems.map(item => (
             <div key={item.product.id} className="flex justify-between items-center text-left">
               <div className="flex items-center space-x-4">
-                <img src={item.product.imageUrl} alt={item.product.name} className="w-16 h-16 object-cover rounded-md border" loading="lazy" decoding="async" />
+                <img src={item.product.imageUrl} alt={item.product.name} className="w-16 h-16 object-cover rounded-md border border-gray-200 dark:border-gray-600 bg-white" loading="lazy" decoding="async" />
                 <div>
-                  <p className="font-medium text-gray-800">{item.product.name}</p>
-                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                  <p className="font-medium text-gray-800 dark:text-white">{item.product.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
                 </div>
               </div>
-              <p className="font-semibold text-gray-800">৳{item.product.price.toLocaleString()}</p>
+              <p className="font-semibold text-gray-800 dark:text-white">৳{item.product.price.toLocaleString()}</p>
             </div>
           ))}
         </div>
-        <div className="border-t mt-4 pt-4 flex justify-between font-bold text-lg">
+        <div className="border-t border-gray-200 dark:border-gray-700 mt-4 pt-4 flex justify-between font-bold text-lg text-gray-900 dark:text-white">
           <span>Total</span>
           <span>৳{total.toLocaleString()}</span>
         </div>
@@ -51,7 +50,7 @@ const OrderConfirmationPage: React.FC = () => {
 
       <Link
         to="/"
-        className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-100 transition-colors"
+        className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
       >
         Back to Home
       </Link>

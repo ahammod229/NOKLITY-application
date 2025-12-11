@@ -55,42 +55,42 @@ const QuickViewModal: React.FC<QuickViewModalProps> = ({ product, onClose }) => 
       role="dialog"
     >
       <div
-        className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row relative"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row relative transition-colors duration-200"
         onClick={e => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10" aria-label="Close">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 z-10" aria-label="Close">
           <Icon name="x" className="w-6 h-6" />
         </button>
         
         {/* Image Section */}
         <div className="w-full md:w-1/2 p-4">
-          <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+          <div className="aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center transition-colors">
             <img src={product.imageUrl} alt={product.name} className="max-w-full max-h-full object-contain" />
           </div>
         </div>
         
         {/* Details Section */}
         <div className="w-full md:w-1/2 p-6 flex flex-col">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{product.name}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{product.name}</h2>
           
           <div className="mb-4">
             <p className="text-3xl font-bold text-orange-500">৳{product.price.toLocaleString()}</p>
             {product.originalPrice && (
-              <div className="flex items-center text-base text-gray-500">
+              <div className="flex items-center text-base text-gray-500 dark:text-gray-400">
                 <span className="line-through">৳{product.originalPrice.toLocaleString()}</span>
                 <span className="ml-3 font-semibold">-{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%</span>
               </div>
             )}
           </div>
           
-          <p className="text-gray-600 mb-6 flex-grow">{shortDescription}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 flex-grow">{shortDescription}</p>
 
           <div className="flex items-center gap-8 mb-6">
-            <p className="font-semibold text-gray-700">Quantity</p>
-            <div className="flex items-center border border-gray-200 rounded">
-              <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-2 text-gray-500 hover:bg-gray-100"><Icon name="minus" className="w-5 h-5"/></button>
-              <span className="px-4 font-semibold">{quantity}</span>
-              <button onClick={() => setQuantity(q => q + 1)} className="p-2 text-gray-500 hover:bg-gray-100"><Icon name="plus" className="w-5 h-5"/></button>
+            <p className="font-semibold text-gray-700 dark:text-gray-300">Quantity</p>
+            <div className="flex items-center border border-gray-200 dark:border-gray-600 rounded">
+              <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="minus" className="w-5 h-5"/></button>
+              <span className="px-4 font-semibold text-gray-900 dark:text-white">{quantity}</span>
+              <button onClick={() => setQuantity(q => q + 1)} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"><Icon name="plus" className="w-5 h-5"/></button>
             </div>
           </div>
           

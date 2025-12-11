@@ -85,11 +85,23 @@
                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
                     Orders
                 </a>
+                <a href="#" onclick="showSection('finance')" id="nav-finance" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Finance
+                </a>
 
                 <p class="px-6 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Management</p>
                 <a href="#" onclick="showSection('products')" id="nav-products" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                     Products
+                </a>
+                <a href="#" onclick="showSection('reviews')" id="nav-reviews" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                    Reviews
+                </a>
+                <a href="#" onclick="showSection('websites')" id="nav-websites" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
+                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+                    Websites
                 </a>
                 <a href="#" onclick="showSection('users')" id="nav-users" class="sidebar-link flex items-center px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-300">
                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -200,6 +212,48 @@
                     </div>
                 </div>
 
+                <!-- SECTION: FINANCE (NEW) -->
+                <div id="section-finance" class="space-y-6 hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Finance & Earnings</h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Total Revenue</h3>
+                            <p class="text-3xl font-bold text-gray-800 dark:text-white mt-2" id="fin-total-revenue">৳ 0</p>
+                            <p class="text-xs text-green-500 mt-1">+12% from last month</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Pending Clearance</h3>
+                            <p class="text-3xl font-bold text-gray-800 dark:text-white mt-2" id="fin-pending">৳ 0</p>
+                            <p class="text-xs text-gray-500 mt-1">Orders in 'Shipped' or 'Processing'</p>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">Available for Withdrawal</h3>
+                            <p class="text-3xl font-bold text-gray-800 dark:text-white mt-2" id="fin-available">৳ 0</p>
+                            <button class="mt-4 w-full bg-noklity-red text-white text-xs font-bold py-2 rounded hover:bg-noklity-dark transition">Request Withdrawal</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+                            <h2 class="text-lg font-bold text-gray-800 dark:text-white">Transaction History</h2>
+                        </div>
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">Order ID / Ref</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Date</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Amount</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="finance-list-body" class="text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- SECTION: PRODUCTS -->
                 <div id="section-products" class="space-y-6 hidden">
                     <div class="flex justify-between items-center">
@@ -227,6 +281,53 @@
                         <div id="product-pagination-controls" class="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                             <!-- Populated by JS -->
                         </div>
+                    </div>
+                </div>
+
+                <!-- SECTION: REVIEWS (NEW) -->
+                <div id="section-reviews" class="space-y-6 hidden">
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Review Management</h1>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">Product ID</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Reviewer</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Rating</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Comment</th>
+                                    <th class="px-6 py-3 font-medium uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reviews-list-body" class="text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- NEW SECTION: WEBSITES -->
+                <div id="section-websites" class="space-y-6 hidden">
+                    <div class="flex justify-between items-center">
+                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Website Management</h1>
+                        <button onclick="toggleWebsiteModal(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center transition-colors shadow-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Add Website
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+                                    <th class="px-6 py-3 font-medium uppercase">Website Name</th>
+                                    <th class="px-6 py-3 font-medium uppercase">URL</th>
+                                    <th class="px-6 py-3 font-medium uppercase">Status</th>
+                                    <th class="px-6 py-3 font-medium uppercase text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="website-list-body" class="text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -483,6 +584,40 @@
         </div>
     </div>
 
+    <!-- ADD/EDIT WEBSITE MODAL (NEW) -->
+    <div id="websiteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md transition-colors">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <h2 id="websiteModalTitle" class="text-xl font-bold text-gray-800 dark:text-white">Add Website</h2>
+                <button onclick="toggleWebsiteModal(false)" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form id="websiteForm" class="p-6 space-y-5">
+                <input type="hidden" id="w-id">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website Name</label>
+                    <input type="text" id="w-name" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website URL</label>
+                    <input type="url" id="w-url" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                    <select id="w-status" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-gray-700 text-gray-800 dark:text-white">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
+                    <button type="button" onclick="toggleWebsiteModal(false)" class="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">Save Website</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- ADD/EDIT USER MODAL -->
     <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto transition-colors">
@@ -536,7 +671,590 @@
     </div>
     
     <script>
-        // File intentionally left blank. The closing script tag will be added by the logic below.
+        // State Management
+        let products = [];
+        let users = [];
+        let orders = [];
+        let banners = [];
+        let websites = [];
+        let reviews = [];
+        let deleteCallback = null;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            loadData();
+            setupEventListeners();
+            renderDashboard();
+            renderProducts();
+            renderUsers();
+            renderOrders();
+            renderBanners();
+            renderWebsites();
+            renderReviews();
+            renderFinance();
+            setupDate();
+            applyTheme();
+        });
+
+        // --- Auth Logic ---
+        function checkLogin() {
+            if (localStorage.getItem('admin_logged_in') === 'true') {
+                showAdminPanel();
+            } else {
+                showLoginScreen();
+            }
+        }
+
+        function showLoginScreen() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-panel').classList.add('hidden');
+        }
+
+        function showAdminPanel() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (u === 'ali.noklity' && p === 'Ilovemoney') {
+                localStorage.setItem('admin_logged_in', 'true');
+                showAdminPanel();
+            } else {
+                const err = document.getElementById('login-error');
+                err.classList.remove('hidden');
+                setTimeout(() => err.classList.add('hidden'), 3000);
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('admin_logged_in');
+            window.location.reload();
+        }
+
+        // --- Data Loading ---
+        function loadData() {
+            products = JSON.parse(localStorage.getItem('admin_products') || '[]');
+            users = JSON.parse(localStorage.getItem('admin_users') || '[]');
+            orders = JSON.parse(localStorage.getItem('admin_orders') || '[]');
+            banners = JSON.parse(localStorage.getItem('admin_banners') || '[]');
+            websites = JSON.parse(localStorage.getItem('admin_websites') || '[]');
+            reviews = JSON.parse(localStorage.getItem('site_reviews') || '[]');
+
+            // Seed initial data if empty
+            if (users.length === 0) {
+                users = [
+                    { id: 1, name: 'Ahammod Ali', email: 'admin@noklity.com', role: 'Admin', status: 'Active', joined: '2023-01-01' },
+                    { id: 2, name: 'John Doe', email: 'john@example.com', role: 'Customer', status: 'Active', joined: '2023-05-12' }
+                ];
+                saveUsers();
+            }
+        }
+
+        // --- Navigation ---
+        function showSection(sectionId) {
+            // Hide all sections
+            ['dashboard', 'products', 'users', 'orders', 'marketing', 'settings', 'websites', 'reviews', 'finance'].forEach(id => {
+                document.getElementById('section-' + id).classList.add('hidden');
+                const nav = document.getElementById('nav-' + id);
+                if (nav) nav.classList.remove('active');
+            });
+
+            // Show selected
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+            const activeNav = document.getElementById('nav-' + sectionId);
+            if(activeNav) activeNav.classList.add('active');
+        }
+
+        // --- Dashboard Logic ---
+        function renderDashboard() {
+            document.getElementById('total-products-count').innerText = products.length;
+            document.getElementById('total-users-count').innerText = users.length;
+            document.getElementById('new-orders-count').innerText = orders.filter(o => o.status === 'To ship').length;
+            
+            // Calculate Sales
+            const totalSales = orders.reduce((sum, order) => {
+                const orderTotal = order.items.reduce((itemSum, item) => itemSum + (item.price * item.quantity), 0);
+                return sum + orderTotal;
+            }, 0);
+            document.getElementById('total-sales').innerText = '৳ ' + totalSales.toLocaleString();
+
+            // Recent Orders
+            const tbody = document.getElementById('recent-orders-body');
+            tbody.innerHTML = '';
+            orders.slice(0, 5).forEach(order => {
+                const total = order.items.reduce((s, i) => s + (i.price * i.quantity), 0);
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4">#${order.id}</td>
+                    <td class="px-6 py-4">${order.sellerName || 'Customer'}</td>
+                    <td class="px-6 py-4">৳ ${total.toLocaleString()}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}">${order.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getStatusColor(status) {
+            if(status === 'Shipped') return 'bg-blue-100 text-blue-700';
+            if(status === 'Completed') return 'bg-green-100 text-green-700';
+            if(status === 'Cancelled') return 'bg-red-100 text-red-700';
+            return 'bg-yellow-100 text-yellow-700';
+        }
+
+        // --- Website Management Logic ---
+        function renderWebsites() {
+            const tbody = document.getElementById('website-list-body');
+            tbody.innerHTML = '';
+            websites.forEach(site => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium">${site.name}</td>
+                    <td class="px-6 py-4"><a href="${site.url}" target="_blank" class="text-blue-500 hover:underline">${site.url}</a></td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs rounded-full ${site.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">${site.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="editWebsite(${site.id})" class="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                        <button onclick="deleteWebsite(${site.id})" class="text-red-500 hover:text-red-700">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleWebsiteModal(show) {
+            const modal = document.getElementById('websiteModal');
+            if (show) {
+                document.getElementById('websiteForm').reset();
+                document.getElementById('w-id').value = '';
+                document.getElementById('websiteModalTitle').innerText = 'Add Website';
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function editWebsite(id) {
+            const site = websites.find(w => w.id === id);
+            if (!site) return;
+            document.getElementById('w-id').value = site.id;
+            document.getElementById('w-name').value = site.name;
+            document.getElementById('w-url').value = site.url;
+            document.getElementById('w-status').value = site.status;
+            document.getElementById('websiteModalTitle').innerText = 'Edit Website';
+            document.getElementById('websiteModal').classList.remove('hidden');
+        }
+
+        document.getElementById('websiteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('w-id').value;
+            const name = document.getElementById('w-name').value;
+            const url = document.getElementById('w-url').value;
+            const status = document.getElementById('w-status').value;
+
+            if (id) {
+                // Edit
+                const index = websites.findIndex(w => w.id == id);
+                if (index !== -1) {
+                    websites[index] = { ...websites[index], name, url, status };
+                    showToast('Website updated successfully');
+                }
+            } else {
+                // Add
+                const newSite = { id: Date.now(), name, url, status };
+                websites.push(newSite);
+                showToast('Website added successfully');
+            }
+            localStorage.setItem('admin_websites', JSON.stringify(websites));
+            renderWebsites();
+            toggleWebsiteModal(false);
+        });
+
+        function deleteWebsite(id) {
+            showConfirmModal('Delete Website', 'Are you sure you want to delete this website?', () => {
+                websites = websites.filter(w => w.id !== id);
+                localStorage.setItem('admin_websites', JSON.stringify(websites));
+                renderWebsites();
+                showToast('Website deleted');
+            });
+        }
+
+        // --- Product Logic (With Edit) ---
+        function renderProducts() {
+            const tbody = document.getElementById('product-list-body');
+            tbody.innerHTML = '';
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 flex items-center">
+                        <img src="${p.imageUrl}" class="w-10 h-10 rounded mr-3 bg-gray-100 object-cover">
+                        <span class="font-medium">${p.name}</span>
+                    </td>
+                    <td class="px-6 py-4 capitalize">${p.categoryId}</td>
+                    <td class="px-6 py-4 font-medium">৳ ${p.price}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="editProduct(${p.id})" class="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
+                        <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:text-red-700">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleProductModal(show) {
+             const modal = document.getElementById('productModal');
+             if(show) {
+                 if(!document.getElementById('p-id').value) {
+                    document.getElementById('productForm').reset();
+                    document.getElementById('productModalTitle').innerText = 'Add New Product';
+                 }
+                 modal.classList.remove('hidden');
+             } else {
+                 modal.classList.add('hidden');
+                 document.getElementById('p-id').value = ''; // Reset ID on close
+             }
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            document.getElementById('p-id').value = product.id;
+            document.getElementById('p-name').value = product.name;
+            document.getElementById('p-price').value = product.price;
+            document.getElementById('p-original').value = product.originalPrice || '';
+            document.getElementById('p-category').value = product.categoryId;
+            document.getElementById('p-brand').value = product.brand || '';
+            document.getElementById('p-desc').value = product.description;
+            // Note: Image upload/preview logic would need to be handled here for full edit support
+            
+            document.getElementById('productModalTitle').innerText = 'Edit Product';
+            toggleProductModal(true);
+        }
+
+        document.getElementById('productForm').addEventListener('submit', (e) => {
+             e.preventDefault();
+             const id = document.getElementById('p-id').value;
+             const name = document.getElementById('p-name').value;
+             const price = Number(document.getElementById('p-price').value);
+             const originalPrice = document.getElementById('p-original').value ? Number(document.getElementById('p-original').value) : undefined;
+             const category = document.getElementById('p-category').value;
+             const brand = document.getElementById('p-brand').value;
+             const desc = document.getElementById('p-desc').value;
+             const imageUrl = "https://placehold.co/400"; // Placeholder for new, or keep existing
+
+             if (id) {
+                 const index = products.findIndex(p => p.id == id);
+                 if (index !== -1) {
+                     products[index] = { 
+                         ...products[index], 
+                         name, price, originalPrice, categoryId: category, brand, description: desc 
+                     };
+                     showToast('Product updated successfully');
+                 }
+             } else {
+                 const newProduct = {
+                     id: Date.now(),
+                     name,
+                     price,
+                     originalPrice,
+                     categoryId: category,
+                     brand,
+                     imageUrl,
+                     description: desc
+                 };
+                 products.push(newProduct);
+                 showToast('Product added successfully');
+             }
+             
+             localStorage.setItem('admin_products', JSON.stringify(products));
+             renderProducts();
+             renderDashboard();
+             toggleProductModal(false);
+        });
+
+        function deleteProduct(id) {
+             showConfirmModal('Delete Product', 'Delete this product permanently?', () => {
+                 products = products.filter(p => p.id !== id);
+                 localStorage.setItem('admin_products', JSON.stringify(products));
+                 renderProducts();
+                 renderDashboard();
+                 showToast('Product deleted');
+             });
+        }
+
+        // --- Reviews Logic (New) ---
+        function renderReviews() {
+            const tbody = document.getElementById('reviews-list-body');
+            tbody.innerHTML = '';
+            reviews.forEach(review => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4">${review.productId}</td>
+                    <td class="px-6 py-4 font-medium">${review.author}<br><span class="text-xs text-gray-500">${review.date}</span></td>
+                    <td class="px-6 py-4 text-yellow-500 font-bold">${review.rating} ★</td>
+                    <td class="px-6 py-4 truncate max-w-xs">${review.comment}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteReview('${review.id}')" class="text-red-500 hover:text-red-700 text-sm">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteReview(id) {
+            showConfirmModal('Delete Review', 'Are you sure you want to remove this review?', () => {
+                reviews = reviews.filter(r => r.id !== id);
+                localStorage.setItem('site_reviews', JSON.stringify(reviews));
+                renderReviews();
+                showToast('Review deleted');
+            });
+        }
+
+        // --- Finance Logic (New) ---
+        function renderFinance() {
+            // Calculate totals
+            let totalRevenue = 0;
+            let pendingClearance = 0;
+            
+            orders.forEach(order => {
+                const orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                
+                if (order.status === 'Completed' || order.status === 'Delivered') {
+                    totalRevenue += orderTotal;
+                } else if (order.status === 'Shipped' || order.status === 'To ship') {
+                    pendingClearance += orderTotal;
+                }
+            });
+
+            document.getElementById('fin-total-revenue').innerText = '৳ ' + totalRevenue.toLocaleString();
+            document.getElementById('fin-pending').innerText = '৳ ' + pendingClearance.toLocaleString();
+            document.getElementById('fin-available').innerText = '৳ ' + (totalRevenue * 0.9).toLocaleString(); // Mock 90% available
+
+            // Render Transactions (Mocked based on orders)
+            const tbody = document.getElementById('finance-list-body');
+            tbody.innerHTML = '';
+            
+            // Show last 5 completed/delivered orders as transactions
+            const transactions = orders
+                .filter(o => ['Completed', 'Delivered'].includes(o.status))
+                .slice(0, 5);
+
+            transactions.forEach(order => {
+                const total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4">#${order.id}</td>
+                    <td class="px-6 py-4">2024-10-15</td>
+                    <td class="px-6 py-4 text-green-600 font-medium">+ ৳ ${total.toLocaleString()}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">Credited</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- User Logic ---
+        function renderUsers() {
+            const tbody = document.getElementById('user-list-body');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-300';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium">${u.name}<br><span class="text-xs text-gray-500">${u.email}</span></td>
+                    <td class="px-6 py-4">${u.role}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full">${u.status}</span></td>
+                    <td class="px-6 py-4">${u.joined}</td>
+                    <td class="px-6 py-4 text-center">
+                        <button onclick="deleteUser(${u.id})" class="text-red-500 hover:text-red-700">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function saveUsers() {
+             localStorage.setItem('admin_users', JSON.stringify(users));
+        }
+
+        function toggleUserModal(show) {
+             const modal = document.getElementById('userModal');
+             show ? modal.classList.remove('hidden') : modal.classList.add('hidden');
+        }
+
+        function deleteUser(id) {
+            showConfirmModal('Delete User', 'Remove this user?', () => {
+                 users = users.filter(u => u.id !== id);
+                 saveUsers();
+                 renderUsers();
+                 renderDashboard();
+                 showToast('User deleted');
+            });
+        }
+
+        document.getElementById('userForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('u-name').value;
+            const email = document.getElementById('u-email').value;
+            const role = document.getElementById('u-role').value;
+            
+            users.push({
+                id: Date.now(),
+                name,
+                email,
+                role,
+                status: 'Active',
+                joined: new Date().toISOString().split('T')[0]
+            });
+            saveUsers();
+            renderUsers();
+            renderDashboard();
+            toggleUserModal(false);
+            showToast('User added');
+        });
+
+        // --- Orders Logic ---
+        function renderOrders() {
+             const tbody = document.getElementById('order-list-body');
+             tbody.innerHTML = '';
+             orders.forEach(order => {
+                 const total = order.items.reduce((s, i) => s + (i.price * i.quantity), 0);
+                 const tr = document.createElement('tr');
+                 tr.className = 'border-b border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-300';
+                 tr.innerHTML = `
+                    <td class="px-6 py-4">#${order.id}</td>
+                    <td class="px-6 py-4">${order.sellerName || 'Customer'}</td>
+                    <td class="px-6 py-4">৳ ${total.toLocaleString()}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}">${order.status}</span></td>
+                    <td class="px-6 py-4 text-center">
+                        <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-sm border border-gray-300 dark:border-gray-600 rounded p-1 dark:bg-gray-700">
+                            <option value="To Pay" ${order.status === 'To Pay' ? 'selected' : ''}>To Pay</option>
+                            <option value="To ship" ${order.status === 'To ship' ? 'selected' : ''}>To ship</option>
+                            <option value="Shipped" ${order.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Delivered" ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${order.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                 `;
+                 tbody.appendChild(tr);
+             });
+        }
+
+        function updateOrderStatus(id, newStatus) {
+             const idx = orders.findIndex(o => o.id === id);
+             if (idx !== -1) {
+                 orders[idx].status = newStatus;
+                 localStorage.setItem('admin_orders', JSON.stringify(orders));
+                 renderOrders();
+                 renderDashboard();
+                 renderFinance(); // Update finance when status changes
+                 showToast('Order status updated');
+             }
+        }
+
+        // --- Banners Logic ---
+        function renderBanners() {
+            const list = document.getElementById('banner-list');
+            list.innerHTML = '';
+            banners.forEach((b, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600';
+                div.innerHTML = `
+                   <div class="flex items-center gap-3">
+                       <img src="${b.image}" class="w-16 h-8 object-cover rounded">
+                       <div>
+                           <p class="text-xs font-semibold text-gray-700 dark:text-gray-300">${b.location}</p>
+                           <p class="text-xs text-gray-500 truncate w-32">${b.link || 'No link'}</p>
+                       </div>
+                   </div>
+                   <button onclick="deleteBanner(${index})" class="text-red-500 hover:text-red-700 text-xs">Remove</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        document.getElementById('bannerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const image = document.getElementById('banner-url').value;
+            const link = document.getElementById('banner-link').value;
+            const location = document.getElementById('banner-location').value;
+            
+            banners.push({ image, link, location });
+            localStorage.setItem('admin_banners', JSON.stringify(banners));
+            renderBanners();
+            showToast('Banner added');
+            document.getElementById('bannerForm').reset();
+        });
+
+        function deleteBanner(index) {
+             banners.splice(index, 1);
+             localStorage.setItem('admin_banners', JSON.stringify(banners));
+             renderBanners();
+        }
+
+        // --- Utility Functions ---
+        function setupEventListeners() {
+            // General setup stuff
+        }
+
+        function setupDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
+        }
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            t.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                t.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function showConfirmModal(title, text, callback) {
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalText').innerText = text;
+            deleteCallback = callback;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+             document.getElementById('confirmModal').classList.add('hidden');
+             deleteCallback = null;
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+             if (deleteCallback) deleteCallback();
+             document.getElementById('confirmModal').classList.add('hidden');
+             deleteCallback = null;
+        });
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        
+        function applyTheme() {
+            if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                 document.documentElement.classList.add('dark');
+            } else {
+                 document.documentElement.classList.remove('dark');
+            }
+        }
     </script>
 </body>
 </html>

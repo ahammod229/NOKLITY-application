@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -22,7 +20,7 @@ const Footer: React.FC = () => {
                 <FooterLink to="/">Shop</FooterLink>
                 <FooterLink to="/contact">Customer Service</FooterLink>
                 <FooterLink to="#">Press & Advertisers</FooterLink>
-                <FooterLink to="/privacy">Aegreass lean is</FooterLink>
+                <FooterLink to="/privacy">Privacy Policy</FooterLink>
             </ul>
           </div>
 
@@ -46,8 +44,17 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 pt-6 text-center text-gray-500 text-sm">
-          <p>&copy; {new Date().getFullYear()} ICO AIAREET Aiyete resorned.</p>
+        {/* COPYRIGHT & ADMIN LINK SECTION */}
+        <div className="border-t border-gray-700 pt-6 flex flex-col items-center gap-3 text-gray-500 text-sm">
+          <p>&copy; {new Date().getFullYear()} NOKLITY E-Commerce. All rights reserved.</p>
+          
+          {/* THIS IS THE BUTTON CODE */}
+          <a 
+            href="/admin.html" 
+            className="inline-block border border-gray-600 text-gray-400 hover:text-white hover:border-white px-3 py-1 rounded text-xs transition-colors"
+          >
+            Go to Admin Panel &rarr;
+          </a>
         </div>
       </div>
     </footer>

@@ -169,6 +169,29 @@ export type Order = {
   estimatedDelivery?: string;
   deliveryPartner?: string;
   trackingHistory?: TrackingEvent[];
+  customerName?: string;
+  customerPhone?: string;
+  total?: number;
+  paymentMethod?: string;
+  orderDate?: string;
+  paymentInfo?: {
+    method?: string;
+    status?: string;
+    date?: string;
+    bankDetails?: {
+      bankName?: string;
+      accountNumber?: string;
+      transactionRef?: string;
+      documentType?: string;
+      documentImage?: string;
+    };
+  };
+  billingAddress?: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+  };
 };
 
 // Mock data to represent the orders from the screenshot and for other tabs

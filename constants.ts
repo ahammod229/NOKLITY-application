@@ -1,5 +1,4 @@
 
-
 export interface Product {
   id: number;
   name: string;
@@ -26,7 +25,15 @@ export interface Product {
   answeredQuestions?: number;
   reviews?: Review[];
   freeShipping?: boolean;
+  deliveryFee?: number;
+  deliveryTime?: string;
+  warranty?: string;
+  returnPolicy?: string;
   sold?: number;
+  status?: string;
+  specifications?: string;
+  relatedIds?: string;
+  featuredIndex?: number;
 }
 
 export interface Category {
@@ -53,4 +60,15 @@ export interface Review {
   variantInfo?: string;
   sellerRating?: 'Positive' | 'Neutral' | 'Negative';
   isAnonymous?: boolean;
+}
+
+export interface Address {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  street: string;
+  city: string;
+  postalCode: string;
+  isDefault: boolean;
 }

@@ -20,13 +20,6 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   });
 
-  // Persist to local storage whenever orders change
-  useEffect(() => {
-    localStorage.setItem('admin_orders', JSON.stringify(orders));
-    // Dispatch event so other tabs/windows (like admin panel) update
-    window.dispatchEvent(new Event('storage')); 
-  }, [orders]);
-
   // Listen for changes from other tabs (e.g. Admin updating status)
   useEffect(() => {
       const handleStorageChange = (e: StorageEvent) => {
@@ -39,8 +32,20 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, []);
 
   const addOrder = (newOrder: Order) => {
-    // Add the new order to the beginning of the list
-    setOrders(prevOrders => [newOrder, ...prevOrders]);
+    // Read fresh from storage to avoid race conditions with other tabs/admin
+    let currentOrders = [];
+    try {
+        const stored = localStorage.getItem('admin_orders');
+        currentOrders = stored ? JSON.parse(stored) : mockOrders;
+    } catch {
+        currentOrders = orders;
+    }
+    
+    const updatedOrders = [newOrder, ...currentOrders];
+    setOrders(updatedOrders);
+    localStorage.setItem('admin_orders', JSON.stringify(updatedOrders));
+    // Dispatch event so other tabs/windows (like admin panel) update immediately
+    window.dispatchEvent(new Event('storage'));
   };
 
   return (

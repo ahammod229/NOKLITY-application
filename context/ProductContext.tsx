@@ -21,9 +21,6 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
       } else {
         // Fallback to static data if no admin data exists yet
         setProducts(initialProducts);
-        // Optional: Initialize storage with static data so admin sees it immediately?
-        // Let's not overwrite storage automatically to avoid side effects, 
-        // admin panel handles its own initialization.
       }
     } catch (e) {
       console.error("Failed to parse products from storage", e);

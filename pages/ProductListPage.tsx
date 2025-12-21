@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { CATEGORIES } from '../types';
 import ProductCard from '../components/ProductCard';
 import type { Product } from '../constants';
 import QuickViewModal from '../components/QuickViewModal';
+import { Icon } from '../components/Icon';
 
 const ProductListPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -14,6 +15,17 @@ const ProductListPage: React.FC = () => {
   const category = CATEGORIES.find(c => c.id === categoryId);
   const products: Product[] = allProducts.filter(p => p.categoryId === categoryId);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Adjust items per page
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when category changes
+  }, [categoryId]);
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handleQuickView = (product: Product) => {
     setQuickViewProduct(product);
@@ -23,6 +35,12 @@ const ProductListPage: React.FC = () => {
     setQuickViewProduct(null);
   };
 
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+        setCurrentPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   if (!category) {
     return (
@@ -46,13 +64,50 @@ const ProductListPage: React.FC = () => {
           </li>
         </ol>
       </nav>
-      <h1 className="text-3xl font-bold mb-6 border-b pb-4 text-gray-900 dark:text-white border-gray-200 dark:border-gray-700">{category.name}</h1>
+      <div className="flex justify-between items-end mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{category.name}</h1>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{products.length} Products</span>
+      </div>
+      
       {products.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} onQuickViewClick={handleQuickView} />
-          ))}
-        </div>
+        <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {paginatedProducts.map(product => (
+                <ProductCard key={product.id} product={product} onQuickViewClick={handleQuickView} />
+            ))}
+            </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-10 gap-2">
+                    <button 
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`p-2 rounded-md border ${currentPage === 1 ? 'border-gray-200 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:text-gray-600' : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                    >
+                        <Icon name="chevronLeft" className="w-5 h-5" />
+                    </button>
+                    
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => handlePageChange(i + 1)}
+                            className={`w-10 h-10 rounded-md font-medium transition-colors ${currentPage === i + 1 ? 'bg-noklity-red text-white' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                        >
+                            {i + 1}
+                        </button>
+                    ))}
+
+                    <button 
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`p-2 rounded-md border ${currentPage === totalPages ? 'border-gray-200 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:text-gray-600' : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                    >
+                        <Icon name="chevronRight" className="w-5 h-5" />
+                    </button>
+                </div>
+            )}
+        </>
       ) : (
         <p className="text-gray-600 dark:text-gray-400">No products found in this category.</p>
       )}

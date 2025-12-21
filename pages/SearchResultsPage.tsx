@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useProducts } from '../context/ProductContext';
 import { CATEGORIES } from '../types';
@@ -42,6 +42,14 @@ const SearchResultsPage: React.FC = () => {
     rating: 0,
   });
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  useEffect(() => {
+      setCurrentPage(1); // Reset page on new search or filter change
+  }, [query, filters]);
 
   const handleQuickView = (product: Product) => {
     setQuickViewProduct(product);
@@ -123,6 +131,17 @@ const SearchResultsPage: React.FC = () => {
       });
   };
 
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+  const paginatedResults = filteredResults.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+        setCurrentPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div>
       <nav className="text-sm mb-4" aria-label="Breadcrumb">
@@ -194,11 +213,43 @@ const SearchResultsPage: React.FC = () => {
             {/* Results */}
             <main className="lg:col-span-3">
               {filteredResults.length > 0 ? (
-                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
-                  {filteredResults.map(product => (
-                    <ProductCard key={product.id} product={product} highlight={query || ''} onQuickViewClick={handleQuickView} />
-                  ))}
-                </div>
+                <>
+                    <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+                    {paginatedResults.map(product => (
+                        <ProductCard key={product.id} product={product} highlight={query || ''} onQuickViewClick={handleQuickView} />
+                    ))}
+                    </div>
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex justify-center items-center mt-10 gap-2">
+                            <button 
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className={`p-2 rounded-md border ${currentPage === 1 ? 'border-gray-200 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:text-gray-600' : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                            >
+                                <Icon name="chevronLeft" className="w-5 h-5" />
+                            </button>
+                            
+                            {Array.from({ length: totalPages }).map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handlePageChange(i + 1)}
+                                    className={`w-10 h-10 rounded-md font-medium transition-colors ${currentPage === i + 1 ? 'bg-noklity-red text-white' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+
+                            <button 
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className={`p-2 rounded-md border ${currentPage === totalPages ? 'border-gray-200 text-gray-400 cursor-not-allowed dark:border-gray-700 dark:text-gray-600' : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+                            >
+                                <Icon name="chevronRight" className="w-5 h-5" />
+                            </button>
+                        </div>
+                    )}
+                </>
               ) : (
                 <div className="text-center py-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                   <h2 className="text-2xl font-bold text-gray-800 dark:text-white">No products found</h2>

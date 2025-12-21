@@ -19,6 +19,7 @@ const CheckoutPage: React.FC = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [paymentFile, setPaymentFile] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -52,14 +53,60 @@ const CheckoutPage: React.FC = () => {
       }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Helper to compress image
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target?.result as string;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800; // Limit width for admin panel performance
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx?.drawImage(img, 0, 0, width, height);
+                // Compress to JPEG with 0.6 quality
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); 
+            };
+            img.onerror = (error) => reject(error);
+        };
+        reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPaymentFile(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setIsUploading(true);
+      try {
+        const file = e.target.files[0];
+        // Compress the image before setting state
+        const compressedImage = await compressImage(file);
+        setPaymentFile(compressedImage);
+        toast.success("Document uploaded & compressed successfully");
+      } catch (error) {
+        console.error("Image compression failed", error);
+        toast.error("Failed to process image. Please try another.");
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -331,15 +378,21 @@ const CheckoutPage: React.FC = () => {
                                 type="file" 
                                 accept="image/*,.pdf"
                                 onChange={handleFileChange}
+                                disabled={isUploading}
                                 className="block w-full text-sm text-gray-500
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-full file:border-0
                                 file:text-sm file:font-semibold
                                 file:bg-noklity-red file:text-white
                                 hover:file:bg-red-700
+                                disabled:opacity-50
                                 dark:text-gray-400"
                             />
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload screenshot or receipt of the transaction.</p>
+                            {isUploading ? (
+                                <p className="mt-1 text-xs text-orange-500 font-medium">Compressing image, please wait...</p>
+                            ) : (
+                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload screenshot or receipt of the transaction.</p>
+                            )}
                         </div>
 
                         <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 text-xs rounded border border-yellow-200 dark:border-yellow-800">
@@ -353,8 +406,12 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-          <button type="submit" className="w-full bg-noklity-red text-white font-bold py-4 rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200 dark:shadow-none text-lg">
-            Place Order
+          <button 
+            type="submit" 
+            disabled={isUploading}
+            className={`w-full bg-noklity-red text-white font-bold py-4 rounded-lg hover:bg-red-700 transition-colors shadow-lg shadow-red-200 dark:shadow-none text-lg ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {isUploading ? 'Processing...' : 'Place Order'}
           </button>
         </form>
       </div>
